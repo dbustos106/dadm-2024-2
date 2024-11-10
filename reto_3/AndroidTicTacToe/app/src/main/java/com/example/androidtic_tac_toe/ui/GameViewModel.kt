@@ -30,6 +30,7 @@ class GameViewModel : ViewModel() {
      */
     fun startNewGame(){
         _uiState.value = GameUiState(currentPlayer = selectRandomPlayer())
+
     }
 
     private fun selectRandomPlayer(): Char {
@@ -37,6 +38,10 @@ class GameViewModel : ViewModel() {
             return HUMAN_PLAYER
         }
         return COMPUTER_PLAYER
+    }
+
+    fun makeComputerMove(){
+
     }
 
     fun handlePlayerTurn(location: Int){
@@ -83,7 +88,7 @@ class GameViewModel : ViewModel() {
      * to actually make the computer move to that location.
      * @return The best move for the computer to make (0-8).
      */
-    private fun getComputerMove(): Int {
+    private fun getBetterComputerMove(): Int {
         var blockingMove: Int? = null
         val board = _uiState.value.board.toMutableList()
 

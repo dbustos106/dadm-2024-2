@@ -17,7 +17,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             AndroidTicTacToeTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) {
-                        innerPadding -> GameScreen(modifier = Modifier.padding(innerPadding))
+                        innerPadding -> GameScreen(modifier = Modifier.padding(innerPadding).fillMaxSize())
                 }
             }
         }

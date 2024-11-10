@@ -18,5 +18,6 @@ data class GameUiState(
     val numberPlayerWins: Int = 0,
     val numberComputerWins: Int = 0,
     val numberTies: Int = 0,
-    val infoText: String = "info text"
+    val infoText: String = " ",
+    val computerMessage: String = " "
 )

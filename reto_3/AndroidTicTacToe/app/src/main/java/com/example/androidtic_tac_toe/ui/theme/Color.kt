@@ -2,6 +2,8 @@ package com.example.androidtic_tac_toe.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
+val veryDarkGray = Color(0xFF1A1A1A)
+
 val defaultButtonColor = Color.LightGray
 val defaultButtonTextColor = Color.Black
 val humanPlayerButtonColor = Color.Green
