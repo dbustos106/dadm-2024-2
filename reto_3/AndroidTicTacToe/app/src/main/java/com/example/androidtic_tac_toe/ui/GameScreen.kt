@@ -64,6 +64,8 @@ fun GameScreen(gameViewModel: GameViewModel = viewModel(), modifier: Modifier = 
             )
 
             GameBoard(
+                currentUser = gameUiState.currentPlayer,
+                isGameOver = gameUiState.isGameOver,
                 board = gameUiState.board,
                 onClick = { location -> gameViewModel.handlePlayerTurn(location) },
                 modifier = Modifier.padding(16.dp)
@@ -133,6 +135,8 @@ fun GameComputerSection(
 
 @Composable
 fun GameBoard(
+    currentUser: Char,
+    isGameOver: Boolean,
     board: List<ButtonState>,
     onClick: (Int) -> Unit,
     modifier: Modifier = Modifier
@@ -151,9 +155,11 @@ fun GameBoard(
                 for (col in 0..2) {
                     val location = row * 3 + col
                     GameButton(
+                        location = location,
+                        currentUser = currentUser,
+                        isGameOver = isGameOver,
                         board = board,
                         onClick = onClick,
-                        location = location,
                         modifier = Modifier
                             .weight(1f)
                             .aspectRatio(1f)
@@ -167,15 +173,20 @@ fun GameBoard(
 
 @Composable
 fun GameButton(
+    location: Int,
+    currentUser: Char,
+    isGameOver: Boolean,
     board: List<ButtonState>,
     onClick: (Int) -> Unit,
-    location: Int,
     modifier: Modifier = Modifier
 ) {
+
     ElevatedButton (
         onClick = { onClick(location) },
         shape = RoundedCornerShape(8.dp),
-        enabled = board[location].isEnabled,
+        enabled = board[location].isEnabled
+                && currentUser == HUMAN_PLAYER
+                && !isGameOver,
         modifier = modifier,
         elevation = ButtonDefaults.elevatedButtonElevation(
             defaultElevation = 20.dp,
@@ -183,7 +194,9 @@ fun GameButton(
         ),
         colors = ButtonDefaults.buttonColors(
             containerColor = board[location].backgroundColor,
-            contentColor = board[location].textColor
+            contentColor = board[location].textColor,
+            //disabledContainerColor = board[location].backgroundColor,
+            disabledContentColor = board[location].textColor
         )
     ) {
         Text(text = board[location].text.toString(), fontSize = 24.sp)
@@ -203,7 +216,7 @@ fun GameBar(
         modifier = modifier
     ) {
         GameBarItem(score = numberPlayerWins, label = stringResource(R.string.tu), Modifier.weight(1f))
-        GameBarItem(score = numberComputerWins, label = stringResource(R.string.computador), Modifier.weight(1f))
+        GameBarItem(score = numberComputerWins, label = stringResource(R.string.android), Modifier.weight(1f))
         GameBarItem(score = numberTies, label = stringResource(R.string.empates), Modifier.weight(1f))
     }
 }

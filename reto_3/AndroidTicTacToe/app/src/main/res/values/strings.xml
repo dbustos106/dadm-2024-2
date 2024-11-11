@@ -1,5 +1,6 @@
 <resources>
+    <string name="app_name">Android Tic-Tac-Toe</string>
     <string name="tu">Tu</string>
-    <string name="computador">Computador</string>
+    <string name="android">Android</string>
     <string name="empates">Empates</string>
 </resources>

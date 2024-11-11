@@ -1,6 +1,10 @@
 package com.example.androidtic_tac_toe.ui
 
+import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import com.example.androidtic_tac_toe.ui.theme.computerPlayerButtonColor
 import com.example.androidtic_tac_toe.ui.theme.humanPlayerButtonColor
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -10,10 +14,9 @@ import kotlinx.coroutines.flow.update
 import kotlin.random.Random
 
 /**
- * Represents the game logic for Tic-Tac-Toe (3x3).
- * Manages the game board, player moves, and checks for a winner.
- * Players are 'X' (human) and 'O' (computer), with empty spots represented by a space (' ').
- *
+ * Represents the game logic for Tic-Tac-Toe (3x3). Manages the game board,
+ * player moves, and checks for a winner. Players are 'X' (human) and
+ * 'O' (computer), with empty spots represented by a space (' ').
  */
 class GameViewModel : ViewModel() {
 
@@ -21,18 +24,39 @@ class GameViewModel : ViewModel() {
     private val _uiState = MutableStateFlow(GameUiState())
     val uiState: StateFlow<GameUiState> = _uiState.asStateFlow()
 
+    /**
+     * Initializes the game by starting a new game session.
+     */
     init {
         startNewGame()
     }
 
     /**
-     * Re-initializes the game data to restart the game.
+     * Re-initializes a new game session.
      */
     fun startNewGame(){
         _uiState.value = GameUiState(currentPlayer = selectRandomPlayer())
+        updateMessages(0)
 
+        // Make computer move if it’s its turn
+        if(_uiState.value.currentPlayer == COMPUTER_PLAYER){
+            viewModelScope.launch {
+                delay(1000L)
+                makeComputerMove()
+
+                // Update the message based on the game result
+                val winner = checkForWinner()
+                updateGameState(winner)
+                updateMessages(winner)
+            }
+        }
     }
 
+    /**
+     * Selects a random player to start the game.
+     * @return `HUMAN_PLAYER` if the human is selected to
+     * start, or `COMPUTER_PLAYER` if the computer is selected.
+     */
     private fun selectRandomPlayer(): Char {
         if(Random.nextInt(2) == 0){
             return HUMAN_PLAYER
@@ -40,55 +64,11 @@ class GameViewModel : ViewModel() {
         return COMPUTER_PLAYER
     }
 
-    fun makeComputerMove(){
-
-    }
-
-    fun handlePlayerTurn(location: Int){
-        /*if (mButtonStates.value[location].isEnabled) {
-            setMove(GameViewModel.HUMAN_PLAYER, location)
-
-            // If there is no winner yet, let the computer make a move
-            var winner = mGame.checkForWinner()
-            if (winner == 0) {
-                mInfoText.value = getString(R.string.it_s_android_s_turn)
-                val move = mGame.getComputerMove()
-                setMove(GameViewModel.COMPUTER_PLAYER, move)
-                winner = mGame.checkForWinner()
-            }
-
-            // Update the message based on the game result
-            mInfoText.value = when (winner) {
-                0 -> getString(R.string.it_s_your_turn)
-                1 -> getString(R.string.it_s_a_tie)
-                2 -> getString(R.string.you_won)
-                else -> getString(R.string.android_won)
-            }
-        }*/
-    }
-
     /**
-     * Set the given player at the given location on the game board.
-     * The location must be available, or the board will not be changed.
-     * @param player - The HUMAN_PLAYER or COMPUTER_PLAYER
-     * @param location - The location (0-8) to place the move
-     */
-    private fun setMove(player: Char, location: Int) {
-        val currentBoard = _uiState.value.board.toMutableList()
-        currentBoard[location] = currentBoard[location].copy(
-            text = player,
-            isEnabled = false,
-            backgroundColor = if (player == HUMAN_PLAYER) humanPlayerButtonColor else computerPlayerButtonColor
-        )
-        _uiState.update { it.copy(board = currentBoard)}
-    }
 
-    /**
-     * Return the best move for the computer to make. You must call setMove()
-     * to actually make the computer move to that location.
-     * @return The best move for the computer to make (0-8).
+     * Executes the computer's move in the game.
      */
-    private fun getBetterComputerMove(): Int {
+    private fun makeComputerMove(){
         var blockingMove: Int? = null
         val board = _uiState.value.board.toMutableList()
 
@@ -98,7 +78,7 @@ class GameViewModel : ViewModel() {
                 // See if there's a move O can make to win
                 board[i] = board[i].copy(text = COMPUTER_PLAYER)
                 if (checkForWinner(board) == 3) {
-                    return i
+                    setMove(COMPUTER_PLAYER, i)
                 }
                 board[i] = board[i].copy(text = OPEN_SPOT)
 
@@ -112,7 +92,90 @@ class GameViewModel : ViewModel() {
             }
         }
 
-        return blockingMove ?: (0 until BOARD_SIZE).filter { board[it].text == OPEN_SPOT }.random()
+        val location = blockingMove ?: (0 until BOARD_SIZE).filter { board[it].text == OPEN_SPOT }.random()
+        setMove(COMPUTER_PLAYER, location)
+    }
+
+    /**
+     * Handles the player's move at the specified location.
+     */
+    fun handlePlayerTurn(location: Int){
+        setMove(HUMAN_PLAYER, location)
+
+        // Update the message based on the game result
+        var winner = checkForWinner()
+        updateGameState(winner)
+        updateMessages(winner)
+
+        // Make computer move if the game is not over
+        if (winner == 0 && !_uiState.value.isGameOver) {
+            viewModelScope.launch {
+                delay(1000L)
+                makeComputerMove()
+
+                // Update the message based on the game result
+                winner = checkForWinner()
+                updateGameState(winner)
+                updateMessages(winner)
+            }
+        }
+    }
+
+    /**
+     * Updates the game state based on the game result.
+     * @param winner An integer representing the game's outcome:
+     * 0 if no winner or tie yet, 1 if it's a tie, 2 if X won, or 3 if O won.
+     */
+    private fun updateGameState(winner: Int) {
+        _uiState.update { currentState ->
+            currentState.copy(
+                isGameOver = (winner == 2 || winner == 3),
+                currentPlayer = if (_uiState.value.currentPlayer == 'X') 'Y' else 'X',
+            )
+        }
+    }
+
+    /**
+     * Updates the game messages based on the game outcome.
+     */
+    private fun updateMessages(winner: Int){
+        _uiState.update { currentState ->
+            currentState.copy(
+                infoText = when (winner) {
+                    0 -> {
+                        if (_uiState.value.currentPlayer == 'X') "Es tu turno, haz una buena jugada"
+                        else "Turno de Android"
+                    }
+                    1 -> "es un empate"
+                    2 -> "has ganado"
+                    else -> "android ha ganado"
+                },
+                computerMessage = "Android está pensando..."
+            )
+        }
+    }
+
+    /**
+     * Set the given player at the given location on the game board.
+     * The location must be available, or the board will not be changed.
+     * @param player - The HUMAN_PLAYER or COMPUTER_PLAYER
+     * @param location - The location (0-8) to place the move
+     */
+    private fun setMove(player: Char, location: Int) {
+        val currentBoard = _uiState.value.board.toMutableList()
+        currentBoard[location] = currentBoard[location].copy(
+            text = player,
+            isEnabled = false,
+            textColor = if (player == HUMAN_PLAYER) humanPlayerButtonColor
+                        else computerPlayerButtonColor,
+            backgroundColor = Color.DarkGray
+        )
+
+        _uiState.update { currentState ->
+            currentState.copy(
+                board = currentBoard
+            )
+        }
     }
 
     /**
