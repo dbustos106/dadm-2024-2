@@ -11,7 +11,7 @@ import kotlinx.coroutines.launch
 import kotlin.random.Random
 
 /**
- *
+ * ViewModel for managing Tic-Tac-Toe game logic and UI state updates.
  */
 class GameViewModel : ViewModel() {
 
@@ -20,17 +20,25 @@ class GameViewModel : ViewModel() {
     val uiState: StateFlow<GameUiState> = _uiState.asStateFlow()
 
     /**
-     *
+     * Initializes a new game and sets the first player.
      */
     init {
         startNewGame()
     }
 
     /**
-     *
+     * Starts a new game, setting a random starting player.
+     * If the computer goes first, it makes an initial move.
      */
     fun startNewGame(){
-        _uiState.value = GameUiState(currentPlayer = selectRandomPlayer())
+        val currentStats = _uiState.value
+
+        _uiState.value = GameUiState(
+            currentPlayer = selectRandomPlayer(),
+            numberHumanWins = currentStats.numberHumanWins,
+            numberComputerWins = currentStats.numberComputerWins,
+            numberTies = currentStats.numberTies
+        )
 
         // Make computer move if it’s its turn
         if(_uiState.value.currentPlayer == COMPUTER_PLAYER){
@@ -46,7 +54,7 @@ class GameViewModel : ViewModel() {
     }
 
     /**
-     *
+     * Selects a random player to start the game.
      */
     private fun selectRandomPlayer(): Char {
         if(Random.nextInt(2) == 0){
@@ -56,7 +64,8 @@ class GameViewModel : ViewModel() {
     }
 
     /**
-     *
+     * Determines and executes the computer's move, with
+     * blocking logic if the human player is about to win.
      */
     private fun makeComputerMove(){
         var blockingMove: Int? = null
@@ -67,14 +76,15 @@ class GameViewModel : ViewModel() {
 
                 // See if there's a move O can make to win
                 board[i] = board[i].copy(text = COMPUTER_PLAYER)
-                if (checkForWinner(board) == 3) {
+                if (checkForWinner(board) == WINNER_COMPUTER) {
                     setMove(COMPUTER_PLAYER, i)
+                    return
                 }
                 board[i] = board[i].copy(text = OPEN_SPOT)
 
                 // Add logic to block player
                 board[i] = board[i].copy(text = HUMAN_PLAYER)
-                if (checkForWinner(board) == 2) {
+                if (checkForWinner(board) == WINNER_HUMAN) {
                     blockingMove = i
                 }
                 board[i] = board[i].copy(text = OPEN_SPOT)
@@ -87,7 +97,8 @@ class GameViewModel : ViewModel() {
     }
 
     /**
-     *
+     * Handles the human player's move, checks for a winner, and
+     * initiates the computer's turn if the game is ongoing.
      */
     fun handlePlayerTurn(location: Int){
         setMove(HUMAN_PLAYER, location)
@@ -110,7 +121,8 @@ class GameViewModel : ViewModel() {
     }
 
     /**
-     *
+     * Checks for a winner based on the current state of
+     * the board, including possible tie scenarios.
      */
     private fun checkForWinner(board: List<ButtonState> = _uiState.value.board): Int {
         val winningLines = listOf(
@@ -144,7 +156,7 @@ class GameViewModel : ViewModel() {
     }
 
     /**
-     *
+     * Updates the board with the player's move at the specified location.
      */
     private fun setMove(player: Char, location: Int) {
         val currentBoard = _uiState.value.board.toMutableList()
@@ -159,16 +171,17 @@ class GameViewModel : ViewModel() {
     }
 
     /**
-     *
+     * Updates game state based on the winner, updating
+     * stats like wins, ties, and game status.
      */
     private fun updateGameState(winner: Int) {
         _uiState.update { currentState ->
             currentState.copy(
-                isGameOver = (winner == 1 || winner == 2 || winner == 3),
                 currentPlayer = if (_uiState.value.currentPlayer == 'X') 'O' else 'X',
-                numberPlayerWins = if (winner == 2) currentState.numberPlayerWins + 1 else currentState.numberPlayerWins,
-                numberComputerWins = if (winner == 3) currentState.numberComputerWins + 1 else currentState.numberComputerWins,
-                numberTies = if (winner == 1) currentState.numberTies + 1 else currentState.numberTies,
+                isGameOver = (winner == TIE || winner == WINNER_HUMAN || winner == WINNER_COMPUTER),
+                numberHumanWins = if (winner == WINNER_HUMAN) currentState.numberHumanWins + 1 else currentState.numberHumanWins,
+                numberComputerWins = if (winner == WINNER_COMPUTER) currentState.numberComputerWins + 1 else currentState.numberComputerWins,
+                numberTies = if (winner == TIE) currentState.numberTies + 1 else currentState.numberTies,
                 winner = winner,
             )
         }

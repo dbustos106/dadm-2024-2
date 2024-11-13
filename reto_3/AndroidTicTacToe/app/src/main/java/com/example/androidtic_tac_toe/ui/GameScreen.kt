@@ -1,6 +1,5 @@
 package com.example.androidtic_tac_toe.ui
 
-import android.app.Activity
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -26,17 +25,17 @@ import androidx.compose.material3.MaterialTheme.shapes
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -48,12 +47,13 @@ import com.example.androidtic_tac_toe.R
 import com.example.androidtic_tac_toe.ui.theme.AndroidTicTacToeTheme
 
 /**
- *
+ * Composable function representing the main game screen.
+ * It includes the game board, options button, and displays the current game state.
  */
 @Composable
 fun GameScreen(gameViewModel: GameViewModel = viewModel(), modifier: Modifier = Modifier) {
     val gameUiState by gameViewModel.uiState.collectAsState()
-    val openOptionsDialog = remember { mutableStateOf(false) }
+    val openOptionsDialog = rememberSaveable{ mutableStateOf(false) }
 
     Box(modifier = modifier) {
         IconButton(
@@ -74,6 +74,7 @@ fun GameScreen(gameViewModel: GameViewModel = viewModel(), modifier: Modifier = 
             val opacity = if (gameUiState.currentPlayer == HUMAN_PLAYER) 0.4f else 1f
             GameComputerSection(
                 currentPlayer = gameUiState.currentPlayer,
+                isGameOver = gameUiState.isGameOver,
                 modifier = Modifier
                     .padding(start = 30.dp)
                     .alpha(opacity)
@@ -88,13 +89,13 @@ fun GameScreen(gameViewModel: GameViewModel = viewModel(), modifier: Modifier = 
             )
 
             val infoText = when (gameUiState.winner) {
-                0 -> {
-                    if (gameUiState.currentPlayer == 'X') stringResource(R.string.es_tu_turno_haz_una_buena_jugada)
-                    else stringResource(R.string.turno_de_android)
+                TIE -> stringResource(R.string.es_un_empate)
+                WINNER_HUMAN -> stringResource(R.string.has_ganado)
+                WINNER_COMPUTER -> stringResource(R.string.android_ha_ganado)
+                else -> {
+                    if (gameUiState.currentPlayer == 'O') stringResource(R.string.turno_de_android)
+                    else stringResource(R.string.es_tu_turno_haz_una_buena_jugada)
                 }
-                1 -> stringResource(R.string.es_un_empate)
-                2 -> stringResource(R.string.has_ganado)
-                else -> stringResource(R.string.android_ha_ganado)
             }
 
             Text(
@@ -105,11 +106,12 @@ fun GameScreen(gameViewModel: GameViewModel = viewModel(), modifier: Modifier = 
                 modifier = Modifier.padding(start = 30.dp)
             )
 
-            if(gameUiState.isGameOver || openOptionsDialog.value){
+            if(openOptionsDialog.value) {
                 FinalOptionsDialog(
                     numberTies = gameUiState.numberTies,
-                    numberPlayerWins = gameUiState.numberPlayerWins,
+                    numberHumanWins = gameUiState.numberHumanWins,
                     numberComputerWins = gameUiState.numberComputerWins,
+                    openOptionsDialog = openOptionsDialog,
                     onPlayAgain = { gameViewModel.startNewGame() }
                 )
             }
@@ -118,11 +120,13 @@ fun GameScreen(gameViewModel: GameViewModel = viewModel(), modifier: Modifier = 
 }
 
 /**
- *
+ * Displays a section with the computer's image and thinking indicator.
+ * Visible when it is the computer's turn.
  */
 @Composable
 fun GameComputerSection(
     currentPlayer: Char,
+    isGameOver: Boolean,
     modifier: Modifier = Modifier
 ) {
     Row(
@@ -139,7 +143,7 @@ fun GameComputerSection(
                 .clip(shapes.large)
         )
 
-        if(currentPlayer == COMPUTER_PLAYER) {
+        if(currentPlayer == COMPUTER_PLAYER && !isGameOver) {
             Box(
                 modifier = Modifier
                     .height(80.dp)
@@ -162,7 +166,8 @@ fun GameComputerSection(
 }
 
 /**
- *
+ * Composable for displaying the Tic-Tac-Toe game board.
+ * It dynamically generates rows and columns for each cell.
  */
 @Composable
 fun GameBoard(
@@ -203,7 +208,8 @@ fun GameBoard(
 }
 
 /**
- *
+ * Represents an individual button on the game board.
+ * The button's color and functionality change based on the game state.
  */
 @Composable
 fun GameButton(
@@ -249,29 +255,31 @@ fun GameButton(
 }
 
 /**
- *
+ * Displays the dialog with game options at the end of the game.
+ * Shows scores and provides options to start a new game or exit.
  */
 @Composable
 private fun FinalOptionsDialog(
     numberTies: Int,
-    numberPlayerWins: Int,
+    numberHumanWins: Int,
     numberComputerWins: Int,
+    openOptionsDialog: MutableState<Boolean>,
     onPlayAgain: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val activity = (LocalContext.current as Activity)
-
     AlertDialog(
-        onDismissRequest = {},
+        modifier = modifier,
+        containerColor = colorScheme.surface,
+        onDismissRequest = { openOptionsDialog.value = false },
         title = { Text(text = stringResource(R.string.opciones)) },
         text = {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceAround,
-                modifier = Modifier
+                modifier = modifier
             ) {
                 GameScoreItem(
-                    score = numberPlayerWins,
+                    score = numberHumanWins,
                     label = stringResource(R.string.tu),
                     Modifier.weight(1f)
                 )
@@ -287,24 +295,20 @@ private fun FinalOptionsDialog(
                 )
             }
                },
-
-        modifier = modifier,
-        dismissButton = {
-            TextButton(onClick = { activity.finish() }) {
-                Text(text = stringResource(R.string.cerrar))
-            }
-        },
         confirmButton = {
-            TextButton(onClick = onPlayAgain) {
-                Text(text = stringResource(R.string.nuevo_juego))
+            TextButton(onClick = {
+                openOptionsDialog.value = false
+                onPlayAgain()
+            }) {
+                Text(text = stringResource(R.string.nuevo_juego), color = colorScheme.surfaceTint)
             }
         },
-        containerColor = colorScheme.surface
     )
 }
 
 /**
- *
+ * Shows an individual score item with a label and value.
+ * Used in the game score summary.
  */
 @Composable
 fun GameScoreItem(score: Int, label: String, modifier: Modifier = Modifier) {
@@ -319,7 +323,8 @@ fun GameScoreItem(score: Int, label: String, modifier: Modifier = Modifier) {
 }
 
 /**
- *
+ * Preview function for the GameScreen composable.
+ * Used for development previews in the IDE.
  */
 @Preview(showBackground = true)
 @Composable

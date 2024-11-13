@@ -4,7 +4,7 @@ data class GameUiState(
     val board: List<ButtonState> = List(9) {ButtonState()},
     val currentPlayer: Char = ' ',
     val isGameOver: Boolean = false,
-    val numberPlayerWins: Int = 0,
+    val numberHumanWins: Int = 0,
     val numberComputerWins: Int = 0,
     val numberTies: Int = 0,
     val winner: Int = 0,
