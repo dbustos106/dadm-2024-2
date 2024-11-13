@@ -1,5 +1,6 @@
 package com.example.androidtic_tac_toe.ui
 
+import android.app.Activity
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -7,23 +8,35 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ElevatedButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme.colorScheme
+import androidx.compose.material3.MaterialTheme.shapes
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -33,68 +46,83 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.androidtic_tac_toe.R
 import com.example.androidtic_tac_toe.ui.theme.AndroidTicTacToeTheme
-import com.example.androidtic_tac_toe.ui.theme.veryDarkGray
 
+/**
+ *
+ */
 @Composable
 fun GameScreen(gameViewModel: GameViewModel = viewModel(), modifier: Modifier = Modifier) {
     val gameUiState by gameViewModel.uiState.collectAsState()
+    val openOptionsDialog = remember { mutableStateOf(false) }
 
-    Column(
-        verticalArrangement = Arrangement.SpaceBetween,
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = modifier
-    ) {
-        Column(
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.Start,
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(colorScheme.primary)
-                .weight(1f)
+    Box(modifier = modifier) {
+        IconButton(
+            onClick = { openOptionsDialog.value = !openOptionsDialog.value },
+            modifier = Modifier.align(Alignment.TopEnd)
         ) {
+            Icon(
+                imageVector = Icons.Default.Menu,
+                contentDescription = stringResource(R.string.opciones)
+            )
+        }
 
+        Column(
+            horizontalAlignment = Alignment.Start,
+            verticalArrangement = Arrangement.Center,
+            modifier = Modifier.fillMaxSize()
+        ) {
             val opacity = if (gameUiState.currentPlayer == HUMAN_PLAYER) 0.4f else 1f
-
             GameComputerSection(
                 currentPlayer = gameUiState.currentPlayer,
-                computerMessage = gameUiState.computerMessage,
                 modifier = Modifier
                     .padding(start = 30.dp)
                     .alpha(opacity)
             )
 
             GameBoard(
-                currentUser = gameUiState.currentPlayer,
-                isGameOver = gameUiState.isGameOver,
                 board = gameUiState.board,
+                isGameOver = gameUiState.isGameOver,
+                currentUser = gameUiState.currentPlayer,
                 onClick = { location -> gameViewModel.handlePlayerTurn(location) },
                 modifier = Modifier.padding(16.dp)
             )
 
+            val infoText = when (gameUiState.winner) {
+                0 -> {
+                    if (gameUiState.currentPlayer == 'X') stringResource(R.string.es_tu_turno_haz_una_buena_jugada)
+                    else stringResource(R.string.turno_de_android)
+                }
+                1 -> stringResource(R.string.es_un_empate)
+                2 -> stringResource(R.string.has_ganado)
+                else -> stringResource(R.string.android_ha_ganado)
+            }
+
             Text(
-                text = gameUiState.infoText,
+                text = infoText,
                 fontSize = 18.sp,
-                color = colorScheme.onPrimary,
+                color = colorScheme.onBackground,
                 textAlign = TextAlign.Start,
                 modifier = Modifier.padding(start = 30.dp)
             )
-        }
 
-        GameBar(
-            numberTies = gameUiState.numberTies,
-            numberPlayerWins = gameUiState.numberPlayerWins,
-            numberComputerWins = gameUiState.numberComputerWins,
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(veryDarkGray)
-        )
+            if(gameUiState.isGameOver || openOptionsDialog.value){
+                FinalOptionsDialog(
+                    numberTies = gameUiState.numberTies,
+                    numberPlayerWins = gameUiState.numberPlayerWins,
+                    numberComputerWins = gameUiState.numberComputerWins,
+                    onPlayAgain = { gameViewModel.startNewGame() }
+                )
+            }
+        }
     }
 }
 
+/**
+ *
+ */
 @Composable
 fun GameComputerSection(
     currentPlayer: Char,
-    computerMessage: String,
     modifier: Modifier = Modifier
 ) {
     Row(
@@ -104,11 +132,11 @@ fun GameComputerSection(
     ){
         Image(
             painter = painterResource(R.drawable.computer),
-            contentDescription = null,
+            contentDescription = stringResource(R.string.imagen_de_android),
             contentScale = ContentScale.Crop,
             modifier = Modifier
                 .size(80.dp)
-                .clip(RoundedCornerShape(16.dp))
+                .clip(shapes.large)
         )
 
         if(currentPlayer == COMPUTER_PLAYER) {
@@ -116,12 +144,12 @@ fun GameComputerSection(
                 modifier = Modifier
                     .height(80.dp)
                     .padding(20.dp)
-                    .clip(RoundedCornerShape(16.dp))
-                    .background(colorScheme.onPrimary)
+                    .clip(shapes.large)
+                    .background(colorScheme.primary)
             ) {
                 Text(
-                    text = computerMessage,
-                    color = colorScheme.primary,
+                    text = stringResource(R.string.android_est_pensando),
+                    color = colorScheme.onPrimary,
                     textAlign = TextAlign.Center,
                     modifier = Modifier
                         .fillMaxWidth()
@@ -133,11 +161,14 @@ fun GameComputerSection(
     }
 }
 
+/**
+ *
+ */
 @Composable
 fun GameBoard(
-    currentUser: Char,
-    isGameOver: Boolean,
     board: List<ButtonState>,
+    isGameOver: Boolean,
+    currentUser: Char,
     onClick: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -171,6 +202,9 @@ fun GameBoard(
     }
 }
 
+/**
+ *
+ */
 @Composable
 fun GameButton(
     location: Int,
@@ -180,6 +214,17 @@ fun GameButton(
     onClick: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
+
+    val buttonTextColor = when (board[location].text) {
+        'X' -> colorScheme.onSecondary
+        'O' -> colorScheme.onTertiary
+        else -> Color.Gray
+    }
+
+    val buttonBackgroundColor = when (board[location].isEnabled) {
+        false -> colorScheme.surfaceVariant
+        else -> colorScheme.surface
+    }
 
     ElevatedButton (
         onClick = { onClick(location) },
@@ -193,46 +238,89 @@ fun GameButton(
             pressedElevation = 16.dp
         ),
         colors = ButtonDefaults.buttonColors(
-            containerColor = board[location].backgroundColor,
-            contentColor = board[location].textColor,
-            //disabledContainerColor = board[location].backgroundColor,
-            disabledContentColor = board[location].textColor
+            containerColor = buttonBackgroundColor,
+            contentColor = buttonTextColor,
+            disabledContainerColor = buttonBackgroundColor,
+            disabledContentColor = buttonTextColor,
         )
     ) {
         Text(text = board[location].text.toString(), fontSize = 24.sp)
     }
 }
 
+/**
+ *
+ */
 @Composable
-fun GameBar(
+private fun FinalOptionsDialog(
     numberTies: Int,
     numberPlayerWins: Int,
     numberComputerWins: Int,
+    onPlayAgain: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceAround,
-        modifier = modifier
-    ) {
-        GameBarItem(score = numberPlayerWins, label = stringResource(R.string.tu), Modifier.weight(1f))
-        GameBarItem(score = numberComputerWins, label = stringResource(R.string.android), Modifier.weight(1f))
-        GameBarItem(score = numberTies, label = stringResource(R.string.empates), Modifier.weight(1f))
-    }
+    val activity = (LocalContext.current as Activity)
+
+    AlertDialog(
+        onDismissRequest = {},
+        title = { Text(text = stringResource(R.string.opciones)) },
+        text = {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceAround,
+                modifier = Modifier
+            ) {
+                GameScoreItem(
+                    score = numberPlayerWins,
+                    label = stringResource(R.string.tu),
+                    Modifier.weight(1f)
+                )
+                GameScoreItem(
+                    score = numberComputerWins,
+                    label = stringResource(R.string.android),
+                    Modifier.weight(1f)
+                )
+                GameScoreItem(
+                    score = numberTies,
+                    label = stringResource(R.string.empates),
+                    Modifier.weight(1f)
+                )
+            }
+               },
+
+        modifier = modifier,
+        dismissButton = {
+            TextButton(onClick = { activity.finish() }) {
+                Text(text = stringResource(R.string.cerrar))
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = onPlayAgain) {
+                Text(text = stringResource(R.string.nuevo_juego))
+            }
+        },
+        containerColor = colorScheme.surface
+    )
 }
 
+/**
+ *
+ */
 @Composable
-fun GameBarItem(score: Int, label: String, modifier: Modifier = Modifier) {
+fun GameScoreItem(score: Int, label: String, modifier: Modifier = Modifier) {
     Column(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier
     ) {
-        Text(text = score.toString(), color = colorScheme.onPrimary)
-        Text(text = label, color = colorScheme.onPrimary)
+        Text(text = score.toString(), color = colorScheme.onSurface)
+        Text(text = label, color = colorScheme.onSurface)
     }
 }
 
+/**
+ *
+ */
 @Preview(showBackground = true)
 @Composable
 fun GameScreenPreview() {

@@ -3,4 +3,14 @@
     <string name="tu">Tu</string>
     <string name="android">Android</string>
     <string name="empates">Empates</string>
+    <string name="opciones">Opciones</string>
+    <string name="imagen_de_android">Imagen de Android</string>
+    <string name="android_est_pensando">Android está pensando…</string>
+    <string name="es_un_empate">Es un empate!!!</string>
+    <string name="has_ganado">Has ganado!!!</string>
+    <string name="android_ha_ganado">Android ha ganado!!!</string>
+    <string name="turno_de_android">Turno de Android</string>
+    <string name="es_tu_turno_haz_una_buena_jugada">Es tu turno, haz una buena jugada</string>
+    <string name="cerrar">Cerrar</string>
+    <string name="nuevo_juego">Nuevo Juego</string>
 </resources>
