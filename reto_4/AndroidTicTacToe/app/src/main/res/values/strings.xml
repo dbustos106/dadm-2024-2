@@ -1,0 +1,32 @@
+<resources>
+    <string name="app_name">Android Tic-Tac-Toe</string>
+    <string name="tu">Tu</string>
+    <string name="android">Android</string>
+    <string name="empates">Empates</string>
+    <string name="opciones">Opciones</string>
+    <string name="imagen_de_android">Imagen de Android</string>
+    <string name="android_est_pensando">Android está pensando…</string>
+    <string name="es_un_empate">Es un empate!!!</string>
+    <string name="has_ganado">Has ganado!!!</string>
+    <string name="android_ha_ganado">Android ha ganado!!!</string>
+    <string name="turno_de_android">Turno de Android</string>
+    <string name="es_tu_turno_haz_una_buena_jugada">Es tu turno, haz una buena jugada</string>
+    <string name="cerrar">Cerrar</string>
+    <string name="nuevo_juego">Nuevo Juego</string>
+    <string name="jugar_contra_android">Jugar contra Android</string>
+    <string name="jugar_con_un_amigo">Jugar con un amigo</string>
+    <string name="acerca_de">Acerca de</string>
+    <string name="salir">Salir</string>
+    <string name="ok">OK</string>
+    <string name="about_text">Este es un juego de Tic-Tac-Toe creado con Jetpack Compose.\n\nVersión 1.0\n\nBy David Julian Bustos Cortes</string>
+    <string name="imagen_de_about">Imagen de about</string>
+    <string name="confirmacion_cerrar">¿Estás seguro de que quieres salir de la aplicación?</string>
+    <string name="confirmar_salida">Confirmar salida</string>
+    <string name="si">Si</string>
+    <string name="no">No</string>
+    <string name="regresar_a_home">Regresar a home</string>
+    <string name="m_s_opciones">Más opciones</string>
+    <string name="cambiar_dificultad">Cambiar dificultad</string>
+    <string name="tic_tac_toe">Tic-tac-toe</string>
+    <string name="selecci_n_de_dificultad">Selección de dificultad</string>
+</resources>
