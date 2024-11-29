@@ -37,7 +37,7 @@ fun DifficultyDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(text = stringResource(R.string.selecci_n_de_dificultad)) },
+        title = { Text(text = stringResource(R.string.text_title_difficulty)) },
         text = {
             Column {
                 DifficultyLevel.entries.forEach { difficulty ->
@@ -63,13 +63,12 @@ fun DifficultyDialog(
                     onDifficultySelected(selectedDifficulty)
                     onDismiss()
             }) {
-                Text(text = stringResource(R.string.ok))
+                Text(text = stringResource(R.string.text_option_ok))
             }
-
         },
         dismissButton = {
             Button(onClick = onDismiss) {
-                Text(text = stringResource(R.string.cerrar))
+                Text(text = stringResource(R.string.text_option_close))
             }
         },
         modifier = modifier

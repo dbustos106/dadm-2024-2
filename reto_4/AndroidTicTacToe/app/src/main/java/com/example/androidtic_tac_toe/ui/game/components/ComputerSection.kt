@@ -41,7 +41,7 @@ fun ComputerSection(
     ){
         Image(
             painter = painterResource(R.drawable.computer_section),
-            contentDescription = stringResource(R.string.imagen_de_android),
+            contentDescription = stringResource(R.string.description_computer_image),
             contentScale = ContentScale.Crop,
             modifier = Modifier
                 .size(80.dp)
@@ -57,7 +57,7 @@ fun ComputerSection(
                     .background(colorScheme.surfaceVariant)
             ) {
                 Text(
-                    text = stringResource(R.string.android_est_pensando),
+                    text = stringResource(R.string.text_android_message),
                     color = colorScheme.onSurfaceVariant,
                     textAlign = TextAlign.Center,
                     modifier = Modifier

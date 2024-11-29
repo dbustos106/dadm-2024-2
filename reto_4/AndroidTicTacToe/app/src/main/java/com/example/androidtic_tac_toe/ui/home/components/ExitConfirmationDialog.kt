@@ -20,16 +20,16 @@ fun ExitConfirmationDialog(
 ) {
     AlertDialog(
         onDismissRequest = onCancel,
-        title = { Text(text = stringResource(R.string.confirmar_salida)) },
-        text = { Text(text = stringResource(R.string.confirmacion_cerrar))},
+        title = { Text(text = stringResource(R.string.text_title_exit)) },
+        text = { Text(text = stringResource(R.string.text_confirm_exit))},
         confirmButton = {
             Button (onClick = onExitConfirmed) {
-                Text(stringResource(R.string.si))
+                Text(stringResource(R.string.text_option_yes))
             }
         },
         dismissButton = {
             Button(onClick = onCancel) {
-                Text(stringResource(R.string.no))
+                Text(stringResource(R.string.text_option_no))
             }
         },
         modifier = modifier

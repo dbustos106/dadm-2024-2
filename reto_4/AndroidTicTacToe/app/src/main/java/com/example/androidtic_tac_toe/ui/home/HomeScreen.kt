@@ -77,7 +77,7 @@ fun HomeScreen(
         ) {
             Image(
                 painter = painterResource(id = R.drawable.icono_con_fondo),
-                contentDescription = stringResource(R.string.icono_de_la_aplicaci_n),
+                contentDescription = stringResource(R.string.description_app_icon),
                 contentScale = ContentScale.Crop,
                 modifier = Modifier.fillMaxSize()
             )
@@ -89,7 +89,7 @@ fun HomeScreen(
                 .fillMaxWidth()
                 .padding(bottom = 16.dp, start = 20.dp, end = 20.dp)
         ) {
-            Text(text = stringResource(R.string.jugar_contra_android))
+            Text(text = stringResource(R.string.text_option_game_android))
         }
 
         Button(
@@ -98,7 +98,7 @@ fun HomeScreen(
                 .fillMaxWidth()
                 .padding(bottom = 16.dp, start = 20.dp, end = 20.dp)
         ) {
-            Text(text = stringResource(R.string.jugar_con_un_amigo))
+            Text(text = stringResource(R.string.text_option_game_friend))
         }
 
         Button(
@@ -107,7 +107,7 @@ fun HomeScreen(
                 .fillMaxWidth()
                 .padding(bottom = 16.dp, start = 20.dp, end = 20.dp)
         ) {
-            Text(text = stringResource(R.string.acerca_de))
+            Text(text = stringResource(R.string.text_option_about))
         }
 
         Button(
@@ -116,7 +116,7 @@ fun HomeScreen(
                 .fillMaxWidth()
                 .padding(bottom = 16.dp, start = 20.dp, end = 20.dp)
         ) {
-            Text(text = stringResource(R.string.salir))
+            Text(text = stringResource(R.string.text_option_exit))
         }
 
     }

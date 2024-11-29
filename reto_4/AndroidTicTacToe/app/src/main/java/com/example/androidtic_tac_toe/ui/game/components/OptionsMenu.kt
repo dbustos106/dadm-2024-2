@@ -32,12 +32,12 @@ fun OptionsMenu(
     val options = listOf(
         MenuOption(
             id = 0,
-            name = stringResource(R.string.nuevo_juego),
+            name = stringResource(R.string.text_start_game),
             image = painterResource(id = R.drawable.startgame)
         ),
         MenuOption(
             id = 1,
-            name = stringResource(R.string.cambiar_dificultad),
+            name = stringResource(R.string.text_change_difficulty),
             image = painterResource(id = R.drawable.change_difficulty)
         ),
     )

@@ -32,12 +32,12 @@ fun TopBar(
     var showOptionsMenu by rememberSaveable{ mutableStateOf(false) }
 
     TopAppBar(
-        title = { Text(text = stringResource(R.string.tic_tac_toe)) },
+        title = { Text(text = stringResource(R.string.app_name)) },
         navigationIcon = {
             IconButton(onClick = { onClickReturnHome() }) {
                 Icon(
                     imageVector = Icons.Filled.Home,
-                    contentDescription = stringResource(R.string.regresar_a_home),
+                    contentDescription = stringResource(R.string.description_return_home),
                 )
             }
         },
@@ -45,7 +45,7 @@ fun TopBar(
             IconButton(onClick = { showOptionsMenu = true }) {
                 Icon(
                     imageVector = Icons.Filled.MoreVert,
-                    contentDescription = stringResource(R.string.m_s_opciones),
+                    contentDescription = stringResource(R.string.description_menu_options),
                 )
 
                 OptionsMenu (

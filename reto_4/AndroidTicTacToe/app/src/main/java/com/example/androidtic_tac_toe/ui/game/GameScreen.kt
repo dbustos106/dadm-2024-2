@@ -84,12 +84,12 @@ fun GameScreen(
                     )
 
                     val infoText = when (gameUiState.state) {
-                        GameState.TIE -> stringResource(R.string.es_un_empate)
-                        GameState.WINNER_HUMAN -> stringResource(R.string.has_ganado)
-                        GameState.WINNER_COMPUTER -> stringResource(R.string.android_ha_ganado)
+                        GameState.TIE -> stringResource(R.string.text_state_tie)
+                        GameState.WINNER_HUMAN -> stringResource(R.string.text_state_human_won)
+                        GameState.WINNER_COMPUTER -> stringResource(R.string.text_state_android_won)
                         else -> {
-                            if (gameUiState.currentPlayer == Player.COMPUTER) stringResource(R.string.turno_de_android)
-                            else stringResource(R.string.es_tu_turno_haz_una_buena_jugada)
+                            if (gameUiState.currentPlayer == Player.COMPUTER) stringResource(R.string.text_state_android_turn)
+                            else stringResource(R.string.text_state_human_turn)
                         }
                     }
 
@@ -109,17 +109,17 @@ fun GameScreen(
                 ) {
                     ScoreItem(
                         score = gameUiState.numberHumanWins,
-                        label = stringResource(R.string.tu),
+                        label = stringResource(R.string.text_human_score),
                         Modifier.weight(1f)
                     )
                     ScoreItem(
                         score = gameUiState.numberComputerWins,
-                        label = stringResource(R.string.android),
+                        label = stringResource(R.string.text_android_score),
                         Modifier.weight(1f)
                     )
                     ScoreItem(
                         score = gameUiState.numberTies,
-                        label = stringResource(R.string.empates),
+                        label = stringResource(R.string.text_tie_score),
                         Modifier.weight(1f)
                     )
                 }

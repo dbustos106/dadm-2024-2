@@ -32,7 +32,7 @@ fun AboutDialog(
         onDismissRequest = onDismiss,
         title = {
             Text(
-                text = stringResource(R.string.acerca_de),
+                text = stringResource(R.string.text_option_about),
                 style = MaterialTheme.typography.headlineMedium,
             )
         },
@@ -40,21 +40,21 @@ fun AboutDialog(
             Column (horizontalAlignment = Alignment.CenterHorizontally) {
                 Image(
                     painter = painterResource(R.drawable.about),
-                    contentDescription = stringResource(R.string.imagen_de_about),
+                    contentDescription = stringResource(R.string.description_about_image),
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
                         .size(200.dp)
                         .clip(shapes.large)
                 )
                 Text(
-                    text = stringResource(R.string.about_text),
+                    text = stringResource(R.string.text_about),
                     modifier = Modifier.padding(top = 8.dp)
                 )
             }
         },
         confirmButton = {
             Button (onClick = onDismiss) {
-                Text(stringResource(R.string.ok))
+                Text(stringResource(R.string.text_option_ok))
             }
         },
         modifier = modifier
