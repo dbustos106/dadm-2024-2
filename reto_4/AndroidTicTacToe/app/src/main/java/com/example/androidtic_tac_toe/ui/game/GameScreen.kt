@@ -25,9 +25,10 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.androidtic_tac_toe.R
 import com.example.androidtic_tac_toe.ui.game.components.DifficultyDialog
-import com.example.androidtic_tac_toe.ui.game.components.GameBar
+import com.example.androidtic_tac_toe.ui.game.components.TopBar
 import com.example.androidtic_tac_toe.ui.game.components.GameBoard
-import com.example.androidtic_tac_toe.ui.game.components.GameComputerSection
+import com.example.androidtic_tac_toe.ui.game.components.ComputerSection
+import com.example.androidtic_tac_toe.ui.game.components.ScoreItem
 import com.example.androidtic_tac_toe.ui.theme.AndroidTicTacToeTheme
 
 /**
@@ -46,7 +47,7 @@ fun GameScreen(
 
     Scaffold(
         topBar = {
-            GameBar(
+            TopBar(
                 onClickReturnHome = onClickReturnHome,
                 onClickStartNewGame = { gameViewModel.onEvent(GameUiEvent.StartNewGame) },
                 onClickChangeDifficulty = { showDifficultyDialog = true }
@@ -64,18 +65,18 @@ fun GameScreen(
                     modifier = Modifier.weight(1f)
                 ) {
                     val opacity = if (gameUiState.currentPlayer == Player.HUMAN) 0.4f else 1f
-                    GameComputerSection(
-                        currentPlayer = gameUiState.currentPlayer,
+                    ComputerSection(
                         isGameOver = gameUiState.isGameOver,
+                        currentPlayer = gameUiState.currentPlayer,
                         modifier = Modifier
                             .padding(start = 30.dp)
                             .alpha(opacity)
                     )
 
                     GameBoard(
-                        board = gameUiState.board,
                         isGameOver = gameUiState.isGameOver,
                         currentUser = gameUiState.currentPlayer,
+                        board = gameUiState.board,
                         onClickButton = { location ->
                             gameViewModel.onEvent(GameUiEvent.MakeHumanMove(location))
                         },
@@ -106,17 +107,17 @@ fun GameScreen(
                     horizontalArrangement = Arrangement.Center,
                     modifier = Modifier.background(colorScheme.surfaceVariant)
                 ) {
-                    GameScoreItem(
+                    ScoreItem(
                         score = gameUiState.numberHumanWins,
                         label = stringResource(R.string.tu),
                         Modifier.weight(1f)
                     )
-                    GameScoreItem(
+                    ScoreItem(
                         score = gameUiState.numberComputerWins,
                         label = stringResource(R.string.android),
                         Modifier.weight(1f)
                     )
-                    GameScoreItem(
+                    ScoreItem(
                         score = gameUiState.numberTies,
                         label = stringResource(R.string.empates),
                         Modifier.weight(1f)
@@ -131,31 +132,15 @@ fun GameScreen(
 
     if (showDifficultyDialog) {
         DifficultyDialog(
+            onDismiss = { showDifficultyDialog = false },
             onDifficultySelected = { difficultyLevel ->
                 gameViewModel.onEvent(GameUiEvent.ChangeDifficultyLevel(difficultyLevel))
                 showDifficultyDialog = false
             },
-            onDismiss = { showDifficultyDialog = false },
-            currentDifficultyLevel = gameUiState.difficultyLevel
+            currentDifficultyLevel = gameUiState.difficultyLevel,
         )
     }
 
-}
-
-/**
- * Shows an individual score item with a label and value.
- * Used in the game score summary.
- */
-@Composable
-fun GameScoreItem(score: Int, label: String, modifier: Modifier = Modifier) {
-    Column(
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = modifier
-    ) {
-        Text(text = score.toString(), color = colorScheme.onSurfaceVariant)
-        Text(text = label, color = colorScheme.onSurfaceVariant)
-    }
 }
 
 /**

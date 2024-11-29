@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Android Tic-Tac-Toe</string>
+    <string name="app_name">Triqui Battle</string>
     <string name="tu">Tu</string>
     <string name="android">Android</string>
     <string name="empates">Empates</string>
@@ -29,4 +29,5 @@
     <string name="cambiar_dificultad">Cambiar dificultad</string>
     <string name="tic_tac_toe">Tic-tac-toe</string>
     <string name="selecci_n_de_dificultad">Selección de dificultad</string>
+    <string name="icono_de_la_aplicaci_n">Icono de la aplicación</string>
 </resources>

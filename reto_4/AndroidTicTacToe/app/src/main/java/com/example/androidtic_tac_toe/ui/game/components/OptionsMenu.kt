@@ -25,8 +25,8 @@ import com.example.androidtic_tac_toe.ui.game.MenuOption
 @Composable
 fun OptionsMenu(
     expanded: Boolean,
-    onItemClick: (MenuOption) -> Unit,
     onDismiss: () -> Unit,
+    onItemClick: (MenuOption) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val options = listOf(
@@ -38,7 +38,7 @@ fun OptionsMenu(
         MenuOption(
             id = 1,
             name = stringResource(R.string.cambiar_dificultad),
-            image = painterResource(id = R.drawable.changedifficulty)
+            image = painterResource(id = R.drawable.change_difficulty)
         ),
     )
 

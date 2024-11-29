@@ -23,7 +23,7 @@ import com.example.androidtic_tac_toe.R
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun GameBar(
+fun TopBar(
     onClickReturnHome: () -> Unit = {},
     onClickStartNewGame: () -> Unit = {},
     onClickChangeDifficulty: () -> Unit = {},

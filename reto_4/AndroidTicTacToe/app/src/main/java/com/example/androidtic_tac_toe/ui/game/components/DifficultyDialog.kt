@@ -8,9 +8,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -23,11 +23,14 @@ import androidx.compose.ui.unit.dp
 import com.example.androidtic_tac_toe.R
 import com.example.androidtic_tac_toe.ui.game.DifficultyLevel
 
+/**
+ * Displays a dialog for selecting the difficulty level.
+ */
 @Composable
 fun DifficultyDialog(
+    onDismiss: () -> Unit,
     currentDifficultyLevel: DifficultyLevel,
     onDifficultySelected: (DifficultyLevel) -> Unit,
-    onDismiss: () -> Unit,
     modifier: Modifier = Modifier
 ){
     var selectedDifficulty by rememberSaveable { mutableStateOf(currentDifficultyLevel) }
@@ -56,15 +59,16 @@ fun DifficultyDialog(
             }
         },
         confirmButton = {
-            TextButton (onClick = {
-                onDifficultySelected(selectedDifficulty)
-                onDismiss()
+            Button(onClick = {
+                    onDifficultySelected(selectedDifficulty)
+                    onDismiss()
             }) {
                 Text(text = stringResource(R.string.ok))
             }
+
         },
         dismissButton = {
-            TextButton(onClick = onDismiss) {
+            Button(onClick = onDismiss) {
                 Text(text = stringResource(R.string.cerrar))
             }
         },

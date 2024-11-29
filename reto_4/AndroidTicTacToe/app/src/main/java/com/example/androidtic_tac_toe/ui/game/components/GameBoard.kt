@@ -25,9 +25,9 @@ import com.example.androidtic_tac_toe.ui.game.Player
  */
 @Composable
 fun GameBoard(
-    board: List<ButtonState>,
     isGameOver: Boolean,
     currentUser: Player,
+    board: List<ButtonState>,
     onClickButton: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {

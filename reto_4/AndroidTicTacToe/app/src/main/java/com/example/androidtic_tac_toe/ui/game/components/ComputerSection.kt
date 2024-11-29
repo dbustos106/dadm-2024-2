@@ -29,9 +29,9 @@ import com.example.androidtic_tac_toe.ui.game.Player
  * Visible when it is the computer's turn.
  */
 @Composable
-fun GameComputerSection(
-    currentPlayer: Player,
+fun ComputerSection(
     isGameOver: Boolean,
+    currentPlayer: Player,
     modifier: Modifier = Modifier
 ) {
     Row(
@@ -40,7 +40,7 @@ fun GameComputerSection(
         modifier = modifier
     ){
         Image(
-            painter = painterResource(R.drawable.computer),
+            painter = painterResource(R.drawable.computer_section),
             contentDescription = stringResource(R.string.imagen_de_android),
             contentScale = ContentScale.Crop,
             modifier = Modifier
