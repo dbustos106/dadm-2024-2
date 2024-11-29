@@ -6,7 +6,7 @@ data class GameUiState(
     val state: GameState = GameState.NO_WINNER,
     val gameMode: GameMode = GameMode.SINGLE_PLAYER,
     val difficultyLevel: DifficultyLevel = DifficultyLevel.EXPERT,
-    val board: List<ButtonState> = List(9) { ButtonState() },
+    val board: List<SquareState> = List(9) { SquareState() },
     val currentPlayer: Player = Player.OPEN_SPOT,
     val isGameOver: Boolean = false,
     val numberHumanWins: Int = 0,
@@ -14,7 +14,7 @@ data class GameUiState(
     val numberTies: Int = 0,
 )
 
-data class ButtonState(
+data class SquareState(
     var isEnabled: Boolean = true,
     var player: Player = Player.OPEN_SPOT,
 )

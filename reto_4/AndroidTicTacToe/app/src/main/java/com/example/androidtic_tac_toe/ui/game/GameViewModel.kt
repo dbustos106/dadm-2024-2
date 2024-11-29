@@ -56,7 +56,7 @@ class GameViewModel : ViewModel() {
         _uiState.update { currentState ->
             currentState.copy(
                 state = GameState.NO_WINNER,
-                board = List(9) { ButtonState() },
+                board = List(9) { SquareState() },
                 currentPlayer = selectRandomPlayer(),
                 isGameOver = false,
             )
@@ -84,6 +84,7 @@ class GameViewModel : ViewModel() {
     /**
      * Handles the human player's move, checks for a winner, and
      * initiates the computer's turn if the game is ongoing.
+     * @param location The index on the game board (0 to 8)
      */
     private fun makeHumanMove(location: Int) {
         setMove(Player.HUMAN, location)
@@ -91,7 +92,7 @@ class GameViewModel : ViewModel() {
         // Make computer move if the game is not over
         if(!_uiState.value.isGameOver) {
             viewModelScope.launch {
-                delay(2000L)
+                delay(1000L)
                 makeComputerMove()
             }
         }
@@ -136,10 +137,10 @@ class GameViewModel : ViewModel() {
 
     /**
      * Evaluates the current state of the game based on the board.
-     * @param board A list of ButtonState representing the current state of the game board.
+     * @param board A list of SquareState representing the current state of the game board.
      * @return The current game state: WINNER_HUMAN, WINNER_COMPUTER, TIE, or NO_WINNER.
      */
-    private fun checkGameState(board: List<ButtonState> = _uiState.value.board): GameState {
+    private fun checkGameState(board: List<SquareState> = _uiState.value.board): GameState {
         val winningLines = listOf (
             listOf(0, 1, 2), listOf(3, 4, 5), listOf(6, 7, 8),
             listOf(0, 3, 6), listOf(1, 4, 7), listOf(2, 5, 8),

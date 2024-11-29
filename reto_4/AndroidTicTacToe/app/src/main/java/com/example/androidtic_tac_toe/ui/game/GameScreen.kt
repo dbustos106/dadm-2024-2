@@ -24,11 +24,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.androidtic_tac_toe.R
-import com.example.androidtic_tac_toe.ui.game.components.DifficultyDialog
-import com.example.androidtic_tac_toe.ui.game.components.TopBar
-import com.example.androidtic_tac_toe.ui.game.components.GameBoard
 import com.example.androidtic_tac_toe.ui.game.components.ComputerSection
+import com.example.androidtic_tac_toe.ui.game.components.DifficultyDialog
+import com.example.androidtic_tac_toe.ui.game.components.GameBoard
 import com.example.androidtic_tac_toe.ui.game.components.ScoreItem
+import com.example.androidtic_tac_toe.ui.game.components.TopBar
 import com.example.androidtic_tac_toe.ui.theme.AndroidTicTacToeTheme
 
 /**
@@ -64,7 +64,13 @@ fun GameScreen(
                     verticalArrangement = Arrangement.Center,
                     modifier = Modifier.weight(1f)
                 ) {
-                    val opacity = if (gameUiState.currentPlayer == Player.HUMAN) 0.4f else 1f
+
+                    val opacity = when {
+                        gameUiState.isGameOver -> 0.4f
+                        gameUiState.currentPlayer == Player.HUMAN -> 0.4f
+                        else -> 1f
+                    }
+
                     ComputerSection(
                         isGameOver = gameUiState.isGameOver,
                         currentPlayer = gameUiState.currentPlayer,
@@ -77,10 +83,10 @@ fun GameScreen(
                         isGameOver = gameUiState.isGameOver,
                         currentUser = gameUiState.currentPlayer,
                         board = gameUiState.board,
-                        onClickButton = { location ->
+                        onClickSquare = { location ->
                             gameViewModel.onEvent(GameUiEvent.MakeHumanMove(location))
                         },
-                        modifier = Modifier.padding(16.dp)
+                        modifier = Modifier.padding(25.dp)
                     )
 
                     val infoText = when (gameUiState.state) {
@@ -105,7 +111,9 @@ fun GameScreen(
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.Center,
-                    modifier = Modifier.background(colorScheme.surfaceVariant)
+                    modifier = Modifier
+                        .background(colorScheme.surfaceVariant)
+                        .padding(16.dp)
                 ) {
                     ScoreItem(
                         score = gameUiState.numberHumanWins,

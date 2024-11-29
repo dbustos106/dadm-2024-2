@@ -2,11 +2,15 @@ package com.example.androidtic_tac_toe.ui.game.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
 import androidx.compose.material3.MaterialTheme.colorScheme
+import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 
 /**
  * Shows an individual score item with a label and value.
@@ -23,7 +27,18 @@ fun ScoreItem(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier
     ) {
-        Text(text = score.toString(), color = colorScheme.onSurfaceVariant)
-        Text(text = label, color = colorScheme.onSurfaceVariant)
+        Text(
+            text = label,
+            style = typography.bodyLarge,
+            color = colorScheme.onSurfaceVariant
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Text(
+            text = score.toString(),
+            style = typography.bodyLarge,
+            color = colorScheme.onSurfaceVariant
+        )
     }
 }
