@@ -1,6 +1,8 @@
 package com.example.androidtic_tac_toe.ui.game.components
 
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.VolumeMute
+import androidx.compose.material.icons.automirrored.filled.VolumeUp
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -24,6 +26,8 @@ import com.example.androidtic_tac_toe.R
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TopBar(
+    isSoundEnabled: Boolean,
+    onClickToggleSound: () -> Unit = {},
     onClickReturnHome: () -> Unit = {},
     onClickStartNewGame: () -> Unit = {},
     onClickChangeDifficulty: () -> Unit = {},
@@ -42,6 +46,10 @@ fun TopBar(
             }
         },
         actions = {
+            IconButton(onClick = onClickToggleSound) {
+                val icon = if (isSoundEnabled) Icons.AutoMirrored.Filled.VolumeUp else Icons.AutoMirrored.Filled.VolumeMute
+                Icon(icon, contentDescription = stringResource(R.string.description_option_toggle_sound))
+            }
             IconButton(onClick = { showOptionsMenu = true }) {
                 Icon(
                     imageVector = Icons.Filled.MoreVert,

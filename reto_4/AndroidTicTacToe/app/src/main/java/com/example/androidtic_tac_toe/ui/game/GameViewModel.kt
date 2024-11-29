@@ -3,8 +3,11 @@ package com.example.androidtic_tac_toe.ui.game
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -16,6 +19,10 @@ const val BOARD_SIZE = 9
  * ViewModel for managing Tic-Tac-Toe game logic and UI state updates.
  */
 class GameViewModel : ViewModel() {
+
+    // Event sound
+    private val _playSoundEvent = MutableSharedFlow<GameViewModelEvent>(replay = 0)
+    val playSoundEvent: SharedFlow<GameViewModelEvent> = _playSoundEvent.asSharedFlow()
 
     // Game UI state
     private val _uiState = MutableStateFlow(GameUiState())
@@ -72,6 +79,16 @@ class GameViewModel : ViewModel() {
     }
 
     /**
+     * Selects a random player to start the game.
+     */
+    private fun selectRandomPlayer(): Player {
+        if(Random.nextInt(2) == 0) {
+            return Player.HUMAN
+        }
+        return Player.COMPUTER
+    }
+
+    /**
      * Sets the game's difficulty level.
      * @param level The difficulty level to set (e.g., EASY, MEDIUM, EXPERT).
      */
@@ -89,7 +106,7 @@ class GameViewModel : ViewModel() {
     private fun makeHumanMove(location: Int) {
         setMove(Player.HUMAN, location)
 
-        // Make computer move if the game is not over
+        // Make the computer move if the game is not over
         if(!_uiState.value.isGameOver) {
             viewModelScope.launch {
                 delay(1000L)
@@ -140,7 +157,7 @@ class GameViewModel : ViewModel() {
      * @param board A list of SquareState representing the current state of the game board.
      * @return The current game state: WINNER_HUMAN, WINNER_COMPUTER, TIE, or NO_WINNER.
      */
-    private fun checkGameState(board: List<SquareState> = _uiState.value.board): GameState {
+    private fun checkGameState(board: List<SquareState>): GameState {
         val winningLines = listOf (
             listOf(0, 1, 2), listOf(3, 4, 5), listOf(6, 7, 8),
             listOf(0, 3, 6), listOf(1, 4, 7), listOf(2, 5, 8),
@@ -177,29 +194,19 @@ class GameViewModel : ViewModel() {
      * @param location The index on the game board (0 to 8).
      */
     private fun setMove(player: Player, location: Int) {
+        // Make the move on a mutable copy of the board.
         val currentBoard = _uiState.value.board.toMutableList()
         currentBoard[location] = currentBoard[location].copy (
             player = player,
             isEnabled = false,
         )
 
-        _uiState.update { currentState ->
-            currentState.copy(board = currentBoard)
-        }
-
         // Update the game state based on the move
-        val state = checkGameState()
-        updateGameState(state)
-    }
-
-    /**
-     * Updates game state based on the state, updating stats like wins, ties, and game status.
-     * @param state The current state of the game, which is an instance of the `GameState` enum.
-     */
-    private fun updateGameState(state: GameState) {
+        val state = checkGameState(currentBoard)
         _uiState.update { currentState ->
             currentState.copy (
                 state = state,
+                board = currentBoard,
                 currentPlayer = if (_uiState.value.currentPlayer == Player.HUMAN) Player.COMPUTER else Player.HUMAN,
                 isGameOver = (state == GameState.TIE || state == GameState.WINNER_HUMAN || state == GameState.WINNER_COMPUTER),
                 numberHumanWins = if (state == GameState.WINNER_HUMAN) currentState.numberHumanWins + 1 else currentState.numberHumanWins,
@@ -207,16 +214,15 @@ class GameViewModel : ViewModel() {
                 numberTies = if (state == GameState.TIE) currentState.numberTies + 1 else currentState.numberTies,
             )
         }
-    }
 
-    /**
-     * Selects a random player to start the game.
-     */
-    private fun selectRandomPlayer(): Player {
-        if(Random.nextInt(2) == 0) {
-            return Player.HUMAN
+        // Emit event to start the music
+        viewModelScope.launch {
+            val soundEffect = when (player) {
+                Player.HUMAN -> GameViewModelEvent.PlayHumanSound
+                else -> GameViewModelEvent.PlayComputerSound
+            }
+            _playSoundEvent.emit(soundEffect)
         }
-        return Player.COMPUTER
     }
 
 }

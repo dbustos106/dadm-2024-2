@@ -9,12 +9,14 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.example.androidtic_tac_toe.MediaResources
 import com.example.androidtic_tac_toe.ui.game.GameMode
 import com.example.androidtic_tac_toe.ui.game.GameScreen
 import com.example.androidtic_tac_toe.ui.home.HomeScreen
 
 @Composable
 fun TicTacToeNavHost (
+    mediaResources: MediaResources?,
     navController: NavHostController,
     modifier: Modifier = Modifier
 ) {
@@ -42,6 +44,7 @@ fun TicTacToeNavHost (
             val gameMode = GameMode.valueOf(mode?: GameMode.SINGLE_PLAYER.name)
             GameScreen(
                 gameMode = gameMode,
+                mediaResources = mediaResources,
                 onClickReturnHome = {
                     navController.navigateSingleTopTo(Home.route)
                 },

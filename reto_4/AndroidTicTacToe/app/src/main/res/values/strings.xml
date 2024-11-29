@@ -23,9 +23,13 @@
     <string name="text_option_no">No</string>
     <string name="text_option_ok">OK</string>
     <string name="text_change_difficulty">Cambiar dificultad</string>
+    <string name="text_option_easy">Fácil</string>
+    <string name="text_option_harder">Difícil</string>
+    <string name="text_option_expert">Experto</string>
     <string name="description_menu_options">Más opciones</string>
     <string name="description_about_image">Imagen de about</string>
     <string name="description_app_icon">Icono de la aplicación</string>
     <string name="description_computer_image">Imagen de Android</string>
     <string name="description_return_home">Regresar a home</string>
+    <string name="description_option_toggle_sound">Alternar sonido</string>
 </resources>

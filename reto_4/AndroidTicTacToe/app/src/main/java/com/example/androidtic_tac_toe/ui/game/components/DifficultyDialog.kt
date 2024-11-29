@@ -29,8 +29,8 @@ import com.example.androidtic_tac_toe.ui.game.DifficultyLevel
 @Composable
 fun DifficultyDialog(
     onDismiss: () -> Unit,
-    currentDifficultyLevel: DifficultyLevel,
     onDifficultySelected: (DifficultyLevel) -> Unit,
+    currentDifficultyLevel: DifficultyLevel,
     modifier: Modifier = Modifier
 ){
     var selectedDifficulty by rememberSaveable { mutableStateOf(currentDifficultyLevel) }
@@ -40,20 +40,27 @@ fun DifficultyDialog(
         title = { Text(text = stringResource(R.string.text_title_difficulty)) },
         text = {
             Column {
-                DifficultyLevel.entries.forEach { difficulty ->
+                DifficultyLevel.entries.forEach { difficultyLevel ->
                     Row (
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier
                             .fillMaxWidth()
-                            .clickable { selectedDifficulty = difficulty }
+                            .clickable { selectedDifficulty = difficultyLevel }
                             .padding(vertical = 8.dp)
                     ) {
                         RadioButton(
-                            selected = selectedDifficulty == difficulty,
-                            onClick = { selectedDifficulty = difficulty }
+                            selected = selectedDifficulty == difficultyLevel,
+                            onClick = { selectedDifficulty = difficultyLevel }
                         )
                         Spacer(modifier = Modifier.width(8.dp))
-                        Text(text = difficulty.name)
+
+                        val difficultyLevelText = when (difficultyLevel) {
+                            DifficultyLevel.EASY -> stringResource(R.string.text_option_easy)
+                            DifficultyLevel.HARDER -> stringResource(R.string.text_option_harder)
+                            DifficultyLevel.EXPERT -> stringResource(R.string.text_option_expert)
+                        }
+
+                        Text(text = difficultyLevelText)
                     }
                 }
             }

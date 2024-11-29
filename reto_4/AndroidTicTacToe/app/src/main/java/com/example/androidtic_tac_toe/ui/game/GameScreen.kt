@@ -1,5 +1,6 @@
 package com.example.androidtic_tac_toe.ui.game
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -9,6 +10,7 @@ import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -23,6 +25,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.androidtic_tac_toe.MediaResources
 import com.example.androidtic_tac_toe.R
 import com.example.androidtic_tac_toe.ui.game.components.ComputerSection
 import com.example.androidtic_tac_toe.ui.game.components.DifficultyDialog
@@ -37,17 +40,22 @@ import com.example.androidtic_tac_toe.ui.theme.AndroidTicTacToeTheme
  */
 @Composable
 fun GameScreen(
-    gameMode: GameMode,
+    gameMode: GameMode = GameMode.SINGLE_PLAYER,
+    mediaResources: MediaResources? = null,
     onClickReturnHome: () -> Unit = {},
     gameViewModel: GameViewModel = viewModel(),
     modifier: Modifier = Modifier
 ) {
+    var isSoundEnabled by rememberSaveable { mutableStateOf(true) }
     var showDifficultyDialog by rememberSaveable { mutableStateOf(true) }
+    val playSoundEvent by gameViewModel.playSoundEvent.collectAsState(initial = null)
     val gameUiState by gameViewModel.uiState.collectAsState()
 
     Scaffold(
         topBar = {
             TopBar(
+                isSoundEnabled = isSoundEnabled,
+                onClickToggleSound = { isSoundEnabled = !isSoundEnabled },
                 onClickReturnHome = onClickReturnHome,
                 onClickStartNewGame = { gameViewModel.onEvent(GameUiEvent.StartNewGame) },
                 onClickChangeDifficulty = { showDifficultyDialog = true }
@@ -149,6 +157,29 @@ fun GameScreen(
         )
     }
 
+    if(isSoundEnabled) {
+        LaunchedEffect(playSoundEvent) {
+            playSoundEvent?.let {
+                try {
+                    when (it) {
+                        is GameViewModelEvent.PlayHumanSound -> {
+                            mediaResources?.humanSoundPlayer?.apply {
+                                if (!isPlaying) start()
+                            }
+                        }
+                        is GameViewModelEvent.PlayComputerSound -> {
+                            mediaResources?.computerSoundPlayer?.apply {
+                                if (!isPlaying) start()
+                            }
+                        }
+                    }
+                } catch (e: IllegalStateException) {
+                    Log.e("Error sound", "Error ${e.message}")
+                }
+            }
+        }
+    }
+
 }
 
 /**
@@ -159,6 +190,6 @@ fun GameScreen(
 @Composable
 fun GameScreenPreview() {
     AndroidTicTacToeTheme {
-        GameScreen(gameMode = GameMode.SINGLE_PLAYER)
+        GameScreen()
     }
 }
