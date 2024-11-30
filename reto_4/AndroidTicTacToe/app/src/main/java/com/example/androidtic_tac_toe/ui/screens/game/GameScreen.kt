@@ -163,12 +163,15 @@ fun GameScreen(
     LaunchedEffect(key1 = LocalContext.current) {
         gameViewModel.playSoundEvent.collect { event ->
             try {
-                when (event) {
-                    is GameViewModelEvent.PlayHumanSound -> {
-                        sharedViewModel.playHumanSound()
-                    }
-                    is GameViewModelEvent.PlayComputerSound -> {
-                        sharedViewModel.playComputerSound()
+                if (isSoundEnabled) {
+                    when (event) {
+                        is GameViewModelEvent.PlayHumanSound -> {
+                            sharedViewModel.playHumanSound()
+                        }
+
+                        is GameViewModelEvent.PlayComputerSound -> {
+                            sharedViewModel.playComputerSound()
+                        }
                     }
                 }
             } catch (e: IllegalStateException) {
