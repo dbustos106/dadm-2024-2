@@ -1,6 +1,6 @@
-package com.example.androidtic_tac_toe.ui.game
+package com.example.androidtic_tac_toe.ui.screens.game
 
-data class GameUiState(
+data class GameUiState (
     val state: GameState = GameState.NO_WINNER,
     val gameMode: GameMode = GameMode.SINGLE_PLAYER,
     val difficultyLevel: DifficultyLevel = DifficultyLevel.EXPERT,
@@ -12,7 +12,7 @@ data class GameUiState(
     val numberTies: Int = 0,
 )
 
-data class SquareState(
+data class SquareState (
     var isEnabled: Boolean = true,
     var player: Player = Player.OPEN_SPOT,
 )

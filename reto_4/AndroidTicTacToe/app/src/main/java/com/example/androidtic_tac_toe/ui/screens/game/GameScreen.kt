@@ -1,4 +1,4 @@
-package com.example.androidtic_tac_toe.ui.game
+package com.example.androidtic_tac_toe.ui.screens.game
 
 import android.util.Log
 import androidx.compose.foundation.background
@@ -19,20 +19,21 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.androidtic_tac_toe.MediaResources
 import com.example.androidtic_tac_toe.R
-import com.example.androidtic_tac_toe.ui.game.components.ComputerSection
-import com.example.androidtic_tac_toe.ui.game.components.DifficultyDialog
-import com.example.androidtic_tac_toe.ui.game.components.GameBoard
-import com.example.androidtic_tac_toe.ui.game.components.ScoreItem
-import com.example.androidtic_tac_toe.ui.game.components.TopBar
-import com.example.androidtic_tac_toe.ui.theme.AndroidTicTacToeTheme
+import com.example.androidtic_tac_toe.shared.SharedViewModel
+import com.example.androidtic_tac_toe.ui.screens.game.components.ComputerSection
+import com.example.androidtic_tac_toe.ui.screens.game.components.DifficultyDialog
+import com.example.androidtic_tac_toe.ui.screens.game.components.GameBoard
+import com.example.androidtic_tac_toe.ui.screens.game.components.ScoreItem
+import com.example.androidtic_tac_toe.ui.screens.game.components.TopBar
+import com.example.androidtic_tac_toe.ui.screens.game.events.GameUiEvent
+import com.example.androidtic_tac_toe.ui.screens.game.events.GameViewModelEvent
 
 /**
  * Composable function representing the main game screen.
@@ -40,15 +41,17 @@ import com.example.androidtic_tac_toe.ui.theme.AndroidTicTacToeTheme
  */
 @Composable
 fun GameScreen(
-    gameMode: GameMode = GameMode.SINGLE_PLAYER,
-    mediaResources: MediaResources? = null,
-    onClickReturnHome: () -> Unit = {},
+    gameMode: GameMode,
+    onClickReturnHome: () -> Unit,
+    sharedViewModel: SharedViewModel = viewModel(),
     gameViewModel: GameViewModel = viewModel(),
     modifier: Modifier = Modifier
 ) {
-    var isSoundEnabled by rememberSaveable { mutableStateOf(true) }
+    // Variables to manage UI events
     var showDifficultyDialog by rememberSaveable { mutableStateOf(true) }
-    val playSoundEvent by gameViewModel.playSoundEvent.collectAsState(initial = null)
+    var isSoundEnabled by rememberSaveable { mutableStateOf(true) }
+
+    // Observer of the game state flow
     val gameUiState by gameViewModel.uiState.collectAsState()
 
     Scaffold(
@@ -157,39 +160,21 @@ fun GameScreen(
         )
     }
 
-    if(isSoundEnabled) {
-        LaunchedEffect(playSoundEvent) {
-            playSoundEvent?.let {
-                try {
-                    when (it) {
-                        is GameViewModelEvent.PlayHumanSound -> {
-                            mediaResources?.humanSoundPlayer?.apply {
-                                if (!isPlaying) start()
-                            }
-                        }
-                        is GameViewModelEvent.PlayComputerSound -> {
-                            mediaResources?.computerSoundPlayer?.apply {
-                                if (!isPlaying) start()
-                            }
-                        }
+    LaunchedEffect(key1 = LocalContext.current) {
+        gameViewModel.playSoundEvent.collect { event ->
+            try {
+                when (event) {
+                    is GameViewModelEvent.PlayHumanSound -> {
+                        sharedViewModel.playHumanSound()
                     }
-                } catch (e: IllegalStateException) {
-                    Log.e("Error sound", "Error ${e.message}")
+                    is GameViewModelEvent.PlayComputerSound -> {
+                        sharedViewModel.playComputerSound()
+                    }
                 }
+            } catch (e: IllegalStateException) {
+                Log.e("Sound", "Error ${e.message}")
             }
         }
     }
 
-}
-
-/**
- * Preview function for the GameScreen composable.
- * Used for development previews in the IDE.
- */
-@Preview(showBackground = true)
-@Composable
-fun GameScreenPreview() {
-    AndroidTicTacToeTheme {
-        GameScreen()
-    }
 }

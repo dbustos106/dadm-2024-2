@@ -1,4 +1,4 @@
-package com.example.androidtic_tac_toe.ui.game
+package com.example.androidtic_tac_toe.ui.screens.game.events
 
 /**
  * Sealed class representing events in the ViewModel.

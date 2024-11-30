@@ -1,4 +1,4 @@
-package com.example.androidtic_tac_toe.ui.home
+package com.example.androidtic_tac_toe.ui.screens.home
 
 import android.app.Activity
 import androidx.compose.foundation.Image
@@ -27,12 +27,10 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.androidtic_tac_toe.R
-import com.example.androidtic_tac_toe.ui.home.components.AboutDialog
-import com.example.androidtic_tac_toe.ui.home.components.ExitConfirmationDialog
-import com.example.androidtic_tac_toe.ui.theme.AndroidTicTacToeTheme
+import com.example.androidtic_tac_toe.ui.screens.home.components.AboutDialog
+import com.example.androidtic_tac_toe.ui.screens.home.components.ExitConfirmationDialog
 
 /**
  * Composable function representing the home screen of the app.
@@ -136,16 +134,4 @@ fun HomeScreen(
         )
     }
 
-}
-
-/**
- * Preview function for the HomeScreen composable.
- * Used for development previews in the IDE.
- */
-@Preview(showBackground = true)
-@Composable
-fun HomeScreenPreview() {
-    AndroidTicTacToeTheme {
-        HomeScreen()
-    }
 }

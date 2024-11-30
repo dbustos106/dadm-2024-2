@@ -1,4 +1,6 @@
-package com.example.androidtic_tac_toe.ui.game
+package com.example.androidtic_tac_toe.ui.screens.game.events
+
+import com.example.androidtic_tac_toe.ui.screens.game.DifficultyLevel
 
 /**
  * Sealed class representing UI events for the game screen.

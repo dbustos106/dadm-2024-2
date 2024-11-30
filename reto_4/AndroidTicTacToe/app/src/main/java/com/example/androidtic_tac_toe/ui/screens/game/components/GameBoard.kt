@@ -1,4 +1,4 @@
-package com.example.androidtic_tac_toe.ui.game.components
+package com.example.androidtic_tac_toe.ui.screens.game.components
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
@@ -15,8 +15,8 @@ import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import com.example.androidtic_tac_toe.R
-import com.example.androidtic_tac_toe.ui.game.Player
-import com.example.androidtic_tac_toe.ui.game.SquareState
+import com.example.androidtic_tac_toe.ui.screens.game.Player
+import com.example.androidtic_tac_toe.ui.screens.game.SquareState
 
 /**
  * Composable for displaying the Tic-Tac-Toe game board.

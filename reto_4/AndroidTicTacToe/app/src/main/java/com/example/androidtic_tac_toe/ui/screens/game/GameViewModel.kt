@@ -1,7 +1,9 @@
-package com.example.androidtic_tac_toe.ui.game
+package com.example.androidtic_tac_toe.ui.screens.game
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.androidtic_tac_toe.ui.screens.game.events.GameUiEvent
+import com.example.androidtic_tac_toe.ui.screens.game.events.GameViewModelEvent
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow

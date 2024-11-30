@@ -1,4 +1,4 @@
-package com.example.androidtic_tac_toe.ui.game.components
+package com.example.androidtic_tac_toe.ui.screens.game.components
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -21,7 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.androidtic_tac_toe.R
-import com.example.androidtic_tac_toe.ui.game.DifficultyLevel
+import com.example.androidtic_tac_toe.ui.screens.game.DifficultyLevel
 
 /**
  * Displays a dialog for selecting the difficulty level.

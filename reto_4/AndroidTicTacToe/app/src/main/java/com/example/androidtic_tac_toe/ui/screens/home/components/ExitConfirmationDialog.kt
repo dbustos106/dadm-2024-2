@@ -1,4 +1,4 @@
-package com.example.androidtic_tac_toe.ui.home.components
+package com.example.androidtic_tac_toe.ui.screens.home.components
 
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button

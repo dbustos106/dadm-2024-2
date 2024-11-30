@@ -1,4 +1,4 @@
-package com.example.androidtic_tac_toe.ui.game.components
+package com.example.androidtic_tac_toe.ui.screens.game.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -22,7 +22,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.androidtic_tac_toe.R
-import com.example.androidtic_tac_toe.ui.game.Player
+import com.example.androidtic_tac_toe.ui.screens.game.Player
 
 /**
  * Displays a section with the computer's image and thinking indicator.

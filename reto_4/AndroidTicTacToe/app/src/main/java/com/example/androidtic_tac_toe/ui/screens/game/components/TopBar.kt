@@ -1,4 +1,4 @@
-package com.example.androidtic_tac_toe.ui.game.components
+package com.example.androidtic_tac_toe.ui.screens.game.components
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.VolumeMute
