@@ -1,6 +1,5 @@
 package com.example.androidtic_tac_toe.ui.screens.game
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -10,7 +9,6 @@ import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -19,21 +17,18 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.androidtic_tac_toe.R
-import com.example.androidtic_tac_toe.shared.SharedViewModel
 import com.example.androidtic_tac_toe.ui.screens.game.components.ComputerSection
 import com.example.androidtic_tac_toe.ui.screens.game.components.DifficultyDialog
 import com.example.androidtic_tac_toe.ui.screens.game.components.GameBoard
 import com.example.androidtic_tac_toe.ui.screens.game.components.ScoreItem
 import com.example.androidtic_tac_toe.ui.screens.game.components.TopBar
 import com.example.androidtic_tac_toe.ui.screens.game.events.GameUiEvent
-import com.example.androidtic_tac_toe.ui.screens.game.events.GameViewModelEvent
 
 /**
  * Composable function representing the main game screen.
@@ -42,26 +37,21 @@ import com.example.androidtic_tac_toe.ui.screens.game.events.GameViewModelEvent
 @Composable
 fun GameScreen(
     gameMode: GameMode,
+    gameViewModel: GameViewModel = hiltViewModel(),
     onClickReturnHome: () -> Unit,
-    sharedViewModel: SharedViewModel = viewModel(),
-    gameViewModel: GameViewModel = viewModel(),
     modifier: Modifier = Modifier
 ) {
-    // Variables to manage UI events
-    var showDifficultyDialog by rememberSaveable { mutableStateOf(true) }
-    var isSoundEnabled by rememberSaveable { mutableStateOf(true) }
-
-    // Observer of the game state flow
     val gameUiState by gameViewModel.uiState.collectAsState()
+    var showDifficultyDialog by rememberSaveable { mutableStateOf(true) }
 
     Scaffold(
         topBar = {
             TopBar(
-                isSoundEnabled = isSoundEnabled,
-                onClickToggleSound = { isSoundEnabled = !isSoundEnabled },
-                onClickReturnHome = onClickReturnHome,
+                soundEnabled = gameUiState.soundEnabled,
+                onSetSoundEnabled = { gameViewModel.onEvent(GameUiEvent.SetSoundEnabled(!gameUiState.soundEnabled)) },
                 onClickStartNewGame = { gameViewModel.onEvent(GameUiEvent.StartNewGame) },
-                onClickChangeDifficulty = { showDifficultyDialog = true }
+                onClickChangeDifficulty = { showDifficultyDialog = true },
+                onClickReturnHome = { onClickReturnHome() }
             )
         },
         content = { innerPadding ->
@@ -77,13 +67,13 @@ fun GameScreen(
                 ) {
 
                     val opacity = when {
-                        gameUiState.isGameOver -> 0.4f
+                        gameUiState.gameOver -> 0.4f
                         gameUiState.currentPlayer == Player.HUMAN -> 0.4f
                         else -> 1f
                     }
 
                     ComputerSection(
-                        isGameOver = gameUiState.isGameOver,
+                        isGameOver = gameUiState.gameOver,
                         currentPlayer = gameUiState.currentPlayer,
                         modifier = Modifier
                             .padding(start = 30.dp)
@@ -91,7 +81,7 @@ fun GameScreen(
                     )
 
                     GameBoard(
-                        isGameOver = gameUiState.isGameOver,
+                        isGameOver = gameUiState.gameOver,
                         currentUser = gameUiState.currentPlayer,
                         board = gameUiState.board,
                         onClickSquare = { location ->
@@ -100,7 +90,7 @@ fun GameScreen(
                         modifier = Modifier.padding(25.dp)
                     )
 
-                    val infoText = when (gameUiState.state) {
+                    val infoText = when (gameUiState.gameState) {
                         GameState.TIE -> stringResource(R.string.text_state_tie)
                         GameState.WINNER_HUMAN -> stringResource(R.string.text_state_human_won)
                         GameState.WINNER_COMPUTER -> stringResource(R.string.text_state_android_won)
@@ -152,32 +142,11 @@ fun GameScreen(
     if (showDifficultyDialog) {
         DifficultyDialog(
             onDismiss = { showDifficultyDialog = false },
-            onDifficultySelected = { difficultyLevel ->
-                gameViewModel.onEvent(GameUiEvent.ChangeDifficultyLevel(difficultyLevel))
-                showDifficultyDialog = false
+            onSelectedDifficultyLevel = { difficultyLevel ->
+                gameViewModel.onEvent(GameUiEvent.SetDifficultyLevel(difficultyLevel))
             },
             currentDifficultyLevel = gameUiState.difficultyLevel,
         )
-    }
-
-    LaunchedEffect(key1 = LocalContext.current) {
-        gameViewModel.playSoundEvent.collect { event ->
-            try {
-                if (isSoundEnabled) {
-                    when (event) {
-                        is GameViewModelEvent.PlayHumanSound -> {
-                            sharedViewModel.playHumanSound()
-                        }
-
-                        is GameViewModelEvent.PlayComputerSound -> {
-                            sharedViewModel.playComputerSound()
-                        }
-                    }
-                }
-            } catch (e: IllegalStateException) {
-                Log.e("Sound", "Error ${e.message}")
-            }
-        }
     }
 
 }

@@ -2,8 +2,12 @@ package com.example.androidtic_tac_toe.ui.screens.game
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.androidtic_tac_toe.data.UserPreferencesRepository
+import com.example.androidtic_tac_toe.data.model.DifficultyLevel
+import com.example.androidtic_tac_toe.shared.MediaPlayerManager
 import com.example.androidtic_tac_toe.ui.screens.game.events.GameUiEvent
 import com.example.androidtic_tac_toe.ui.screens.game.events.GameViewModelEvent
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -13,6 +17,7 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 import kotlin.random.Random
 
 const val BOARD_SIZE = 9
@@ -20,13 +25,17 @@ const val BOARD_SIZE = 9
 /**
  * ViewModel for managing Tic-Tac-Toe game logic and UI state updates.
  */
-class GameViewModel : ViewModel() {
+@HiltViewModel
+class GameViewModel @Inject constructor(
+    private val mediaPlayerManager: MediaPlayerManager,
+    private val userPreferencesRepository: UserPreferencesRepository
+) : ViewModel() {
 
-    // Event sound
-    private val _playSoundEvent = MutableSharedFlow<GameViewModelEvent>(replay = 0)
-    val playSoundEvent: SharedFlow<GameViewModelEvent> = _playSoundEvent.asSharedFlow()
+    // ViewModel events
+    private val _viewModelEvent = MutableSharedFlow<GameViewModelEvent>(replay = 0)
+    val viewModelEvent: SharedFlow<GameViewModelEvent> = _viewModelEvent.asSharedFlow()
 
-    // Game UI state
+    // UI state
     private val _uiState = MutableStateFlow(GameUiState())
     val uiState: StateFlow<GameUiState> = _uiState.asStateFlow()
 
@@ -34,6 +43,20 @@ class GameViewModel : ViewModel() {
      * Initializes a new game and sets the first player.
      */
     init {
+        viewModelScope.launch {
+            userPreferencesRepository.userPreferencesFlow.collect { userPreferences ->
+                _uiState.update { currentState ->
+                    currentState.copy(
+                        difficultyLevel = userPreferences.difficultyLevel,
+                        soundEnabled = userPreferences.soundEnabled,
+                        numberComputerWins = userPreferences.numberComputerWins,
+                        numberHumanWins = userPreferences.numberHumanWins,
+                        numberTies = userPreferences.numberTies
+                    )
+                }
+            }
+        }
+
         startNewGame()
     }
 
@@ -46,8 +69,11 @@ class GameViewModel : ViewModel() {
             is GameUiEvent.StartNewGame -> {
                 startNewGame()
             }
-            is GameUiEvent.ChangeDifficultyLevel -> {
+            is GameUiEvent.SetDifficultyLevel -> {
                 setDifficultyLevel(event.difficultyLevel)
+            }
+            is GameUiEvent.SetSoundEnabled -> {
+                setSoundEnabled(event.soundEnabled)
             }
             is GameUiEvent.MakeHumanMove -> {
                 makeHumanMove(event.location)
@@ -60,21 +86,20 @@ class GameViewModel : ViewModel() {
      * If the computer goes first, it makes an initial move.
      */
     private fun startNewGame() {
-
         // Reset the game state
         _uiState.update { currentState ->
             currentState.copy(
-                state = GameState.NO_WINNER,
-                board = List(9) { SquareState() },
+                gameState = GameState.NO_WINNER,
                 currentPlayer = selectRandomPlayer(),
-                isGameOver = false,
+                board = List(9) { SquareState() },
+                gameOver = false,
             )
         }
 
         // Make computer move if it’s its turn
         if(_uiState.value.currentPlayer == Player.COMPUTER) {
             viewModelScope.launch {
-                delay(2000L)
+                delay(1000L)
                 makeComputerMove()
             }
         }
@@ -92,11 +117,21 @@ class GameViewModel : ViewModel() {
 
     /**
      * Sets the game's difficulty level.
-     * @param level The difficulty level to set (e.g., EASY, MEDIUM, EXPERT).
+     * @param difficultyLevel The difficulty level to set.
      */
-    private fun setDifficultyLevel(level: DifficultyLevel) {
-        _uiState.update { currentState ->
-            currentState.copy(difficultyLevel = level)
+    private fun setDifficultyLevel(difficultyLevel: DifficultyLevel) {
+        viewModelScope.launch {
+            userPreferencesRepository.updateDifficultyLevel(difficultyLevel)
+        }
+    }
+
+    /**
+     * Sets whether the sound is enabled or disabled.
+     * @param soundEnabled A boolean indicating whether the sound is enabled.
+     */
+    private fun setSoundEnabled(soundEnabled: Boolean){
+        viewModelScope.launch {
+            userPreferencesRepository.updateSoundEnabled(soundEnabled)
         }
     }
 
@@ -109,7 +144,7 @@ class GameViewModel : ViewModel() {
         setMove(Player.HUMAN, location)
 
         // Make the computer move if the game is not over
-        if(!_uiState.value.isGameOver) {
+        if(!_uiState.value.gameOver) {
             viewModelScope.launch {
                 delay(1000L)
                 makeComputerMove()
@@ -204,26 +239,31 @@ class GameViewModel : ViewModel() {
         )
 
         // Update the game state based on the move
-        val state = checkGameState(currentBoard)
+        val gameState = checkGameState(currentBoard)
         _uiState.update { currentState ->
             currentState.copy (
-                state = state,
-                board = currentBoard,
+                gameOver = (gameState == GameState.TIE || gameState == GameState.WINNER_HUMAN || gameState == GameState.WINNER_COMPUTER),
                 currentPlayer = if (_uiState.value.currentPlayer == Player.HUMAN) Player.COMPUTER else Player.HUMAN,
-                isGameOver = (state == GameState.TIE || state == GameState.WINNER_HUMAN || state == GameState.WINNER_COMPUTER),
-                numberHumanWins = if (state == GameState.WINNER_HUMAN) currentState.numberHumanWins + 1 else currentState.numberHumanWins,
-                numberComputerWins = if (state == GameState.WINNER_COMPUTER) currentState.numberComputerWins + 1 else currentState.numberComputerWins,
-                numberTies = if (state == GameState.TIE) currentState.numberTies + 1 else currentState.numberTies,
+                board = currentBoard,
+                gameState = gameState,
             )
         }
 
-        // Emit event to start the music
+        // Update the user preferences based on the move
         viewModelScope.launch {
-            val soundEffect = when (player) {
-                Player.HUMAN -> GameViewModelEvent.PlayHumanSound
-                else -> GameViewModelEvent.PlayComputerSound
+            if (gameState == GameState.WINNER_HUMAN) userPreferencesRepository.updateNumberHumanWins(_uiState.value.numberHumanWins + 1)
+            if (gameState == GameState.WINNER_COMPUTER) userPreferencesRepository.updateNumberComputerWins(_uiState.value.numberComputerWins + 1)
+            if (gameState == GameState.TIE) userPreferencesRepository.updateNumberTies(_uiState.value.numberTies + 1)
+        }
+
+        // Emit event to start the music based on player
+        viewModelScope.launch {
+            if (_uiState.value.soundEnabled) {
+                when (player) {
+                    Player.HUMAN -> mediaPlayerManager.playHumanSound()
+                    else -> mediaPlayerManager.playComputerSound()
+                }
             }
-            _playSoundEvent.emit(soundEffect)
         }
     }
 

@@ -5,14 +5,4 @@ package com.example.androidtic_tac_toe.ui.screens.game.events
  */
 sealed interface GameViewModelEvent {
 
-    /**
-     * Event to play the sound for a human move.
-     */
-    data object PlayHumanSound : GameViewModelEvent
-
-    /**
-     * Event to play the sound for a computer move.
-     */
-    data object PlayComputerSound : GameViewModelEvent
-
 }

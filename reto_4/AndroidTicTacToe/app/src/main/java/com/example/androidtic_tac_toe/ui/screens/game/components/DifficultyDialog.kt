@@ -21,7 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.androidtic_tac_toe.R
-import com.example.androidtic_tac_toe.ui.screens.game.DifficultyLevel
+import com.example.androidtic_tac_toe.data.model.DifficultyLevel
 
 /**
  * Displays a dialog for selecting the difficulty level.
@@ -29,11 +29,11 @@ import com.example.androidtic_tac_toe.ui.screens.game.DifficultyLevel
 @Composable
 fun DifficultyDialog(
     onDismiss: () -> Unit,
-    onDifficultySelected: (DifficultyLevel) -> Unit,
+    onSelectedDifficultyLevel: (DifficultyLevel) -> Unit,
     currentDifficultyLevel: DifficultyLevel,
     modifier: Modifier = Modifier
 ){
-    var selectedDifficulty by rememberSaveable { mutableStateOf(currentDifficultyLevel) }
+    var selectedDifficultyLevel by rememberSaveable { mutableStateOf(currentDifficultyLevel) }
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -45,12 +45,12 @@ fun DifficultyDialog(
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier
                             .fillMaxWidth()
-                            .clickable { selectedDifficulty = difficultyLevel }
+                            .clickable { selectedDifficultyLevel = difficultyLevel }
                             .padding(vertical = 8.dp)
                     ) {
                         RadioButton(
-                            selected = selectedDifficulty == difficultyLevel,
-                            onClick = { selectedDifficulty = difficultyLevel }
+                            selected = selectedDifficultyLevel == difficultyLevel,
+                            onClick = { selectedDifficultyLevel = difficultyLevel }
                         )
                         Spacer(modifier = Modifier.width(8.dp))
 
@@ -67,14 +67,16 @@ fun DifficultyDialog(
         },
         confirmButton = {
             Button(onClick = {
-                    onDifficultySelected(selectedDifficulty)
-                    onDismiss()
+                onSelectedDifficultyLevel(selectedDifficultyLevel)
+                onDismiss()
             }) {
                 Text(text = stringResource(R.string.text_option_ok))
             }
         },
         dismissButton = {
-            Button(onClick = onDismiss) {
+            Button(onClick = {
+                onDismiss()
+            }) {
                 Text(text = stringResource(R.string.text_option_close))
             }
         },

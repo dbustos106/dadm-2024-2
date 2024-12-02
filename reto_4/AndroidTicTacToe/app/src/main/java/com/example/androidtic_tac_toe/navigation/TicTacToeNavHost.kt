@@ -9,14 +9,12 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.example.androidtic_tac_toe.shared.SharedViewModel
 import com.example.androidtic_tac_toe.ui.screens.game.GameMode
 import com.example.androidtic_tac_toe.ui.screens.game.GameScreen
 import com.example.androidtic_tac_toe.ui.screens.home.HomeScreen
 
 @Composable
 fun TicTacToeNavHost (
-    sharedViewModel: SharedViewModel,
     navController: NavHostController,
     modifier: Modifier = Modifier
 ) {
@@ -39,12 +37,13 @@ fun TicTacToeNavHost (
             route = Game.routeWithArgs,
             arguments = Game.arguments
         ) { backStackEntry ->
-            val mode = backStackEntry.arguments?.getString(Game.MODE_ARG)
 
+            // Retrieve route parameters
+            val mode = backStackEntry.arguments?.getString(Game.MODE_ARG)
             val gameMode = GameMode.valueOf(mode?: GameMode.SINGLE_PLAYER.name)
+
             GameScreen(
                 gameMode = gameMode,
-                sharedViewModel = sharedViewModel,
                 onClickReturnHome = {
                     navController.navigateSingleTopTo(Home.route)
                 },

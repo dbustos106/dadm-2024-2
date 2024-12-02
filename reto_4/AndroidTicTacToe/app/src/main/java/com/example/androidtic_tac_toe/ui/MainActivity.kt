@@ -1,18 +1,20 @@
-package com.example.androidtic_tac_toe
+package com.example.androidtic_tac_toe.ui
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.viewModels
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.rememberNavController
 import com.example.androidtic_tac_toe.navigation.TicTacToeNavHost
-import com.example.androidtic_tac_toe.shared.SharedViewModel
+import com.example.androidtic_tac_toe.shared.MediaPlayerManager
 import com.example.androidtic_tac_toe.ui.theme.AndroidTicTacToeTheme
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
-    private val sharedViewModel: SharedViewModel by viewModels()
+    @Inject lateinit var mediaPlayerManager: MediaPlayerManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -21,7 +23,6 @@ class MainActivity : ComponentActivity() {
             val navController = rememberNavController()
             AndroidTicTacToeTheme {
                 TicTacToeNavHost(
-                    sharedViewModel = sharedViewModel,
                     navController = navController,
                     modifier = Modifier
                 )
@@ -31,12 +32,12 @@ class MainActivity : ComponentActivity() {
 
     override fun onResume() {
         super.onResume()
-        sharedViewModel.initializePlayers(applicationContext)
+        mediaPlayerManager.initialize()
     }
 
     override fun onPause() {
         super.onPause()
-        sharedViewModel.releasePlayers()
+        mediaPlayerManager.release()
     }
 
 }

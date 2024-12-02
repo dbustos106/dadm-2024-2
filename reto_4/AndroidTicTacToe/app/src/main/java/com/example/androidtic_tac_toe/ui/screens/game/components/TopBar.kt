@@ -26,11 +26,11 @@ import com.example.androidtic_tac_toe.R
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TopBar(
-    isSoundEnabled: Boolean,
-    onClickToggleSound: () -> Unit = {},
-    onClickReturnHome: () -> Unit = {},
+    soundEnabled: Boolean,
+    onSetSoundEnabled: () -> Unit = {},
     onClickStartNewGame: () -> Unit = {},
     onClickChangeDifficulty: () -> Unit = {},
+    onClickReturnHome: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     var showOptionsMenu by rememberSaveable{ mutableStateOf(false) }
@@ -46,8 +46,8 @@ fun TopBar(
             }
         },
         actions = {
-            IconButton(onClick = onClickToggleSound) {
-                val icon = if (isSoundEnabled) Icons.AutoMirrored.Filled.VolumeUp else Icons.AutoMirrored.Filled.VolumeMute
+            IconButton(onClick = onSetSoundEnabled) {
+                val icon = if (soundEnabled) Icons.AutoMirrored.Filled.VolumeUp else Icons.AutoMirrored.Filled.VolumeMute
                 Icon(icon, contentDescription = stringResource(R.string.description_option_toggle_sound))
             }
             IconButton(onClick = { showOptionsMenu = true }) {

@@ -1,12 +1,15 @@
 package com.example.androidtic_tac_toe.ui.screens.game
 
+import com.example.androidtic_tac_toe.data.model.DifficultyLevel
+
 data class GameUiState (
-    val state: GameState = GameState.NO_WINNER,
+    val gameOver: Boolean = false,
+    val soundEnabled: Boolean = true,
+    val currentPlayer: Player = Player.OPEN_SPOT,
+    val gameState: GameState = GameState.NO_WINNER,
     val gameMode: GameMode = GameMode.SINGLE_PLAYER,
     val difficultyLevel: DifficultyLevel = DifficultyLevel.EXPERT,
     val board: List<SquareState> = List(9) { SquareState() },
-    val currentPlayer: Player = Player.OPEN_SPOT,
-    val isGameOver: Boolean = false,
     val numberComputerWins: Int = 0,
     val numberHumanWins: Int = 0,
     val numberTies: Int = 0,
@@ -33,10 +36,4 @@ enum class Player {
     HUMAN,
     COMPUTER,
     OPEN_SPOT
-}
-
-enum class DifficultyLevel {
-    EASY,
-    HARDER,
-    EXPERT
 }
