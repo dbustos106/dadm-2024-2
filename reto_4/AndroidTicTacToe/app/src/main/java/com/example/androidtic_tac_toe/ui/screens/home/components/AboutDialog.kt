@@ -8,6 +8,7 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MaterialTheme.shapes
+import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -48,6 +49,7 @@ fun AboutDialog(
                 )
                 Text(
                     text = stringResource(R.string.text_about),
+                    style = typography.bodyLarge,
                     modifier = Modifier.padding(top = 8.dp)
                 )
             }

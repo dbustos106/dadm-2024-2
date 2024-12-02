@@ -18,6 +18,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.example.androidtic_tac_toe.R
+import com.example.androidtic_tac_toe.ui.screens.game.events.GameUiEvent
 
 /**
  * Composable that displays the game bar.
@@ -27,11 +28,9 @@ import com.example.androidtic_tac_toe.R
 @Composable
 fun TopBar(
     soundEnabled: Boolean,
-    onClickSetSoundEnabled: () -> Unit = {},
-    onClickStartNewGame: () -> Unit = {},
-    onClickOpenDifficultyDialog: () -> Unit = {},
-    onClickResetScores: () -> Unit = {},
-    onClickReturnHome: () -> Unit = {},
+    onEvent: (GameUiEvent) -> Unit,
+    onClickOpenDifficultyDialog: () -> Unit,
+    onClickReturnHome: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     var showOptionsMenu by rememberSaveable{ mutableStateOf(false) }
@@ -47,7 +46,7 @@ fun TopBar(
             }
         },
         actions = {
-            IconButton(onClick = onClickSetSoundEnabled) {
+            IconButton(onClick = { onEvent(GameUiEvent.SetSoundEnabled(!soundEnabled)) }) {
                 val icon = if (soundEnabled) Icons.AutoMirrored.Filled.VolumeUp else Icons.AutoMirrored.Filled.VolumeMute
                 Icon(icon, contentDescription = stringResource(R.string.description_option_toggle_sound))
             }
@@ -62,14 +61,14 @@ fun TopBar(
                     onClickItem = { option ->
                         when (option.id) {
                             0 -> {
-                                onClickStartNewGame()
+                                onEvent(GameUiEvent.StartNewGame)
                                 onClickOpenDifficultyDialog()
                             }
                             1 -> {
                                 onClickOpenDifficultyDialog()
                             }
                             2 -> {
-                                onClickResetScores()
+                                onEvent(GameUiEvent.ResetScores)
                             }
                         }
                     },
