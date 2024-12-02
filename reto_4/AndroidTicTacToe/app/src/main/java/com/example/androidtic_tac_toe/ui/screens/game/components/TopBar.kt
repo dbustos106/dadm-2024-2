@@ -27,9 +27,9 @@ import com.example.androidtic_tac_toe.R
 @Composable
 fun TopBar(
     soundEnabled: Boolean,
-    onSetSoundEnabled: () -> Unit = {},
+    onClickSetSoundEnabled: () -> Unit = {},
     onClickStartNewGame: () -> Unit = {},
-    onClickChangeDifficulty: () -> Unit = {},
+    onClickOpenDifficultyDialog: () -> Unit = {},
     onClickReturnHome: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
@@ -46,7 +46,7 @@ fun TopBar(
             }
         },
         actions = {
-            IconButton(onClick = onSetSoundEnabled) {
+            IconButton(onClick = onClickSetSoundEnabled) {
                 val icon = if (soundEnabled) Icons.AutoMirrored.Filled.VolumeUp else Icons.AutoMirrored.Filled.VolumeMute
                 Icon(icon, contentDescription = stringResource(R.string.description_option_toggle_sound))
             }
@@ -58,14 +58,14 @@ fun TopBar(
 
                 OptionsMenu (
                     expanded = showOptionsMenu,
-                    onItemClick = { option ->
+                    onClickItem = { option ->
                         when (option.id) {
                             0 -> {
                                 onClickStartNewGame()
-                                onClickChangeDifficulty()
+                                onClickOpenDifficultyDialog()
                             }
                             1 -> {
-                                onClickChangeDifficulty()
+                                onClickOpenDifficultyDialog()
                             }
                         }
                     },

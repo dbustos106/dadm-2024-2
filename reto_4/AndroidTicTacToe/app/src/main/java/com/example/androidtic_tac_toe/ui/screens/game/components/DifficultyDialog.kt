@@ -29,7 +29,7 @@ import com.example.androidtic_tac_toe.data.model.DifficultyLevel
 @Composable
 fun DifficultyDialog(
     onDismiss: () -> Unit,
-    onSelectedDifficultyLevel: (DifficultyLevel) -> Unit,
+    onClickSetDifficultyLevel: (DifficultyLevel) -> Unit,
     currentDifficultyLevel: DifficultyLevel,
     modifier: Modifier = Modifier
 ){
@@ -67,7 +67,7 @@ fun DifficultyDialog(
         },
         confirmButton = {
             Button(onClick = {
-                onSelectedDifficultyLevel(selectedDifficultyLevel)
+                onClickSetDifficultyLevel(selectedDifficultyLevel)
                 onDismiss()
             }) {
                 Text(text = stringResource(R.string.text_option_ok))

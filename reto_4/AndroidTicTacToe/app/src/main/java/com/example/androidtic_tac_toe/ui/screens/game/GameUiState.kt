@@ -3,6 +3,7 @@ package com.example.androidtic_tac_toe.ui.screens.game
 import com.example.androidtic_tac_toe.data.model.DifficultyLevel
 
 data class GameUiState (
+    val loading: Boolean = true,
     val gameOver: Boolean = false,
     val soundEnabled: Boolean = true,
     val currentPlayer: Player = Player.OPEN_SPOT,
@@ -16,7 +17,7 @@ data class GameUiState (
 )
 
 data class SquareState (
-    var isEnabled: Boolean = true,
+    var enabled: Boolean = true,
     var player: Player = Player.OPEN_SPOT,
 )
 

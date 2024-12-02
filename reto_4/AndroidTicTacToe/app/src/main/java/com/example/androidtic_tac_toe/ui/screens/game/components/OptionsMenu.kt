@@ -32,7 +32,7 @@ data class MenuOption(
 fun OptionsMenu(
     expanded: Boolean,
     onDismiss: () -> Unit,
-    onItemClick: (MenuOption) -> Unit,
+    onClickItem: (MenuOption) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val options = listOf(
@@ -56,7 +56,7 @@ fun OptionsMenu(
         options.forEach { option ->
             DropdownMenuItem(
                 onClick = {
-                    onItemClick(option)
+                    onClickItem(option)
                     onDismiss()
                 },
                 text = {

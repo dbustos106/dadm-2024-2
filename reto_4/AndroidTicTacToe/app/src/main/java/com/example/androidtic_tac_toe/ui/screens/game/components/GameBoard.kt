@@ -49,7 +49,7 @@ fun GameBoard(
                 val row = (offset.y / cellHeight).toInt()
                 val location = row * columns + column
 
-                if (!isGameOver && currentUser == Player.HUMAN && board.getOrNull(location)?.isEnabled == true) {
+                if (!isGameOver && currentUser == Player.HUMAN && board.getOrNull(location)?.enabled == true) {
                     onClickSquare(location)
                 }
             }

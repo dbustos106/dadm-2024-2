@@ -48,9 +48,9 @@ fun GameScreen(
         topBar = {
             TopBar(
                 soundEnabled = gameUiState.soundEnabled,
-                onSetSoundEnabled = { gameViewModel.onEvent(GameUiEvent.SetSoundEnabled(!gameUiState.soundEnabled)) },
+                onClickSetSoundEnabled = { gameViewModel.onEvent(GameUiEvent.SetSoundEnabled(!gameUiState.soundEnabled)) },
                 onClickStartNewGame = { gameViewModel.onEvent(GameUiEvent.StartNewGame) },
-                onClickChangeDifficulty = { showDifficultyDialog = true },
+                onClickOpenDifficultyDialog = { showDifficultyDialog = true },
                 onClickReturnHome = { onClickReturnHome() }
             )
         },
@@ -65,7 +65,6 @@ fun GameScreen(
                     verticalArrangement = Arrangement.Center,
                     modifier = Modifier.weight(1f)
                 ) {
-
                     val opacity = when {
                         gameUiState.gameOver -> 0.4f
                         gameUiState.currentPlayer == Player.HUMAN -> 0.4f
@@ -134,18 +133,17 @@ fun GameScreen(
                 }
 
             }
-
         },
         modifier = modifier
     )
 
-    if (showDifficultyDialog) {
+    if (showDifficultyDialog && !gameUiState.loading) {
         DifficultyDialog(
             onDismiss = { showDifficultyDialog = false },
-            onSelectedDifficultyLevel = { difficultyLevel ->
+            onClickSetDifficultyLevel = { difficultyLevel ->
                 gameViewModel.onEvent(GameUiEvent.SetDifficultyLevel(difficultyLevel))
             },
-            currentDifficultyLevel = gameUiState.difficultyLevel,
+            currentDifficultyLevel = gameUiState.difficultyLevel
         )
     }
 

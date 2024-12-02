@@ -51,7 +51,8 @@ class GameViewModel @Inject constructor(
                         soundEnabled = userPreferences.soundEnabled,
                         numberComputerWins = userPreferences.numberComputerWins,
                         numberHumanWins = userPreferences.numberHumanWins,
-                        numberTies = userPreferences.numberTies
+                        numberTies = userPreferences.numberTies,
+                        loading = false
                     )
                 }
             }
@@ -235,7 +236,7 @@ class GameViewModel @Inject constructor(
         val currentBoard = _uiState.value.board.toMutableList()
         currentBoard[location] = currentBoard[location].copy (
             player = player,
-            isEnabled = false,
+            enabled = false,
         )
 
         // Update the game state based on the move

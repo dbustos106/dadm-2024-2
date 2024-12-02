@@ -11,7 +11,6 @@ import com.example.androidtic_tac_toe.data.model.DifficultyLevel
 import com.example.androidtic_tac_toe.data.model.UserPreferences
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import java.io.IOException
 import javax.inject.Inject
@@ -64,13 +63,6 @@ class UserPreferencesRepository @Inject constructor(
             numberHumanWins = numberHumanWins,
             numberTies = numberTies
         )
-    }
-
-    /**
-     * Retrieves the initial user preferences.
-     */
-    suspend fun fetchInitialPreferences(): UserPreferences {
-        return mapUserPreferences(dataStore.data.first().toPreferences())
     }
 
     /**
