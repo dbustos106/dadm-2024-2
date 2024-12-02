@@ -13,6 +13,11 @@ sealed interface GameUiEvent {
     data object StartNewGame: GameUiEvent
 
     /**
+     * Event indicating that the user has selected to reset the scores
+     */
+    data object ResetScores: GameUiEvent
+
+    /**
      * Event indicating that the user has changed the difficulty level.
      * @param difficultyLevel: Selected difficulty level.
      */

@@ -13,6 +13,8 @@
     <string name="text_state_android_turn">Turno de Android</string>
     <string name="text_state_human_turn">Es tu turno, haz una buena jugada</string>
     <string name="text_start_game">Nuevo Juego</string>
+    <string name="text_change_difficulty">Cambiar dificultad</string>
+    <string name="text_reset_scores">Reiniciar puntuaciones</string>
     <string name="text_option_game_android">Jugar contra Android</string>
     <string name="text_option_game_friend">Jugar con un amigo</string>
     <string name="text_option_about">Acerca de</string>
@@ -22,7 +24,6 @@
     <string name="text_option_yes">Si</string>
     <string name="text_option_no">No</string>
     <string name="text_option_ok">OK</string>
-    <string name="text_change_difficulty">Cambiar dificultad</string>
     <string name="text_option_easy">Fácil</string>
     <string name="text_option_harder">Difícil</string>
     <string name="text_option_expert">Experto</string>

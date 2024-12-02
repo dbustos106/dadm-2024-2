@@ -46,6 +46,11 @@ fun OptionsMenu(
             name = stringResource(R.string.text_change_difficulty),
             image = painterResource(id = R.drawable.change_difficulty)
         ),
+        MenuOption(
+            id = 2,
+            name = stringResource(R.string.text_reset_scores),
+            image = painterResource(id = R.drawable.reset_scores)
+        ),
     )
 
     DropdownMenu (

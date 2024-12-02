@@ -51,6 +51,7 @@ fun GameScreen(
                 onClickSetSoundEnabled = { gameViewModel.onEvent(GameUiEvent.SetSoundEnabled(!gameUiState.soundEnabled)) },
                 onClickStartNewGame = { gameViewModel.onEvent(GameUiEvent.StartNewGame) },
                 onClickOpenDifficultyDialog = { showDifficultyDialog = true },
+                onClickResetScores = { gameViewModel.onEvent(GameUiEvent.ResetScores) },
                 onClickReturnHome = { onClickReturnHome() }
             )
         },

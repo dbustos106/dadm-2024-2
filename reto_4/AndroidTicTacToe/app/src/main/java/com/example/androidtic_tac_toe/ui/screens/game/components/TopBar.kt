@@ -30,6 +30,7 @@ fun TopBar(
     onClickSetSoundEnabled: () -> Unit = {},
     onClickStartNewGame: () -> Unit = {},
     onClickOpenDifficultyDialog: () -> Unit = {},
+    onClickResetScores: () -> Unit = {},
     onClickReturnHome: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
@@ -66,6 +67,9 @@ fun TopBar(
                             }
                             1 -> {
                                 onClickOpenDifficultyDialog()
+                            }
+                            2 -> {
+                                onClickResetScores()
                             }
                         }
                     },

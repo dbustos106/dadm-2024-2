@@ -40,7 +40,7 @@ class GameViewModel @Inject constructor(
     val uiState: StateFlow<GameUiState> = _uiState.asStateFlow()
 
     /**
-     * Initializes a new game and sets the first player.
+     * Initializes a new game and load the user preferences.
      */
     init {
         viewModelScope.launch {
@@ -69,6 +69,9 @@ class GameViewModel @Inject constructor(
         when(event) {
             is GameUiEvent.StartNewGame -> {
                 startNewGame()
+            }
+            is GameUiEvent.ResetScores -> {
+                resetScores()
             }
             is GameUiEvent.SetDifficultyLevel -> {
                 setDifficultyLevel(event.difficultyLevel)
@@ -114,6 +117,17 @@ class GameViewModel @Inject constructor(
             return Player.HUMAN
         }
         return Player.COMPUTER
+    }
+
+    /**
+     * Reset the game scores
+     */
+    private fun resetScores() {
+        viewModelScope.launch {
+            userPreferencesRepository.updateNumberComputerWins(0)
+            userPreferencesRepository.updateNumberHumanWins(0)
+            userPreferencesRepository.updateNumberTies(0)
+        }
     }
 
     /**
