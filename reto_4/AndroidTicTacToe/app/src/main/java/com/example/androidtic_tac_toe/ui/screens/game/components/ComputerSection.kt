@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.shapes
 import androidx.compose.material3.MaterialTheme.typography
@@ -52,7 +51,7 @@ fun ComputerSection(
 
         Box(
             modifier = Modifier
-                .padding(20.dp)
+                .padding(start = 20.dp, end = 20.dp)
                 .clip(shapes.large)
                 .background(colorScheme.surfaceVariant)
         ) {
@@ -75,7 +74,7 @@ fun ComputerSection(
                 softWrap = true,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(start = 5.dp, bottom = 10.dp, end = 5.dp, top = 10.dp)
+                    .padding(10.dp)
             )
         }
     }

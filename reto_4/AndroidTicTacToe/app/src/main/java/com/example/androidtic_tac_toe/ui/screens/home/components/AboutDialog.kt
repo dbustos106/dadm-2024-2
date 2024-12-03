@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MaterialTheme.shapes
 import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.Text
@@ -34,7 +33,7 @@ fun AboutDialog(
         title = {
             Text(
                 text = stringResource(R.string.text_option_about),
-                style = MaterialTheme.typography.headlineMedium,
+                style = typography.headlineMedium,
             )
         },
         text = {

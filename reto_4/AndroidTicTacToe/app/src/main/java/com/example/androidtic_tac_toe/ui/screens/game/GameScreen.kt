@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme.colorScheme
+import androidx.compose.material3.MaterialTheme.shapes
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -17,6 +18,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -38,7 +40,6 @@ fun GameScreen(
     onClickReturnHome: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-
     val gameUiState by gameViewModel.uiState.collectAsState()
     var showDifficultyDialog by rememberSaveable { mutableStateOf(true) }
 
@@ -95,23 +96,21 @@ fun PortraitGameScreen(
     onEvent: (GameUiEvent) -> Unit,
     modifier: Modifier = Modifier
 ) {
-
     Column(
         horizontalAlignment = Alignment.Start,
         verticalArrangement = Arrangement.Center,
         modifier = modifier
     ) {
+
         Column(
             horizontalAlignment = Alignment.Start,
             verticalArrangement = Arrangement.Center,
             modifier = Modifier.weight(1f)
         ) {
-
             ComputerSection(
                 gameState = gameUiState.gameState,
                 currentPlayer = gameUiState.currentPlayer,
-                modifier = Modifier
-                    .padding(start = 30.dp)
+                modifier = Modifier.padding(start = 30.dp)
             )
 
             GameBoard(
@@ -123,7 +122,6 @@ fun PortraitGameScreen(
                 },
                 modifier = Modifier.padding(25.dp)
             )
-
         }
 
         ScoreSection(
@@ -180,6 +178,7 @@ fun LandscapeGameScreen(
                 numberHumanWins = gameUiState.numberHumanWins,
                 numberComputerWins = gameUiState.numberComputerWins,
                 modifier = Modifier
+                    .clip(shapes.large)
                     .background(colorScheme.surfaceVariant)
                     .padding(16.dp)
             )
