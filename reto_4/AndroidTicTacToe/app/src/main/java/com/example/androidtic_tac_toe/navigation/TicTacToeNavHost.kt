@@ -25,8 +25,8 @@ fun TicTacToeNavHost (
     ) {
         composable(route = Home.route) {
             HomeScreen(
-                onClickStartNewGame = { mode ->
-                    navController.navigateSingleTopTo("${Game.route}?${Game.MODE_ARG}=${mode}")
+                onStartNewGameClick = { mode ->
+                    navController.navigateSingleTopTo("${Game.route}?${Game.MODE_ARG}=${mode.name}")
                 },
                 modifier = Modifier
                     .fillMaxSize()
@@ -44,7 +44,7 @@ fun TicTacToeNavHost (
 
             GameScreen(
                 gameMode = gameMode,
-                onClickReturnHome = {
+                onReturnHomeClick = {
                     navController.navigateSingleTopTo(Home.route)
                 },
                 modifier = Modifier
@@ -59,8 +59,8 @@ fun NavHostController.navigateSingleTopTo(route: String) = this.navigate(route) 
     popUpTo(
         this@navigateSingleTopTo.graph.findStartDestination().id
     ) {
-        saveState = true
+        inclusive = true
     }
-    launchSingleTop = true
-    restoreState = true
+    launchSingleTop = false
+    restoreState = false
 }

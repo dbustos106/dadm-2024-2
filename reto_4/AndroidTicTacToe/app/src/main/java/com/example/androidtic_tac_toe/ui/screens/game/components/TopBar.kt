@@ -18,7 +18,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.example.androidtic_tac_toe.R
-import com.example.androidtic_tac_toe.ui.screens.game.events.GameUiEvent
 
 /**
  * Composable that displays the game bar.
@@ -28,9 +27,9 @@ import com.example.androidtic_tac_toe.ui.screens.game.events.GameUiEvent
 @Composable
 fun TopBar(
     soundEnabled: Boolean,
-    onEvent: (GameUiEvent) -> Unit,
-    onClickOpenDifficultyDialog: () -> Unit,
-    onClickReturnHome: () -> Unit,
+    options: List<MenuOption>,
+    onToggleSound: (Boolean) -> Unit,
+    onReturnHomeClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     var showOptionsMenu by rememberSaveable{ mutableStateOf(false) }
@@ -38,7 +37,7 @@ fun TopBar(
     TopAppBar(
         title = { Text(text = stringResource(R.string.app_name)) },
         navigationIcon = {
-            IconButton(onClick = { onClickReturnHome() }) {
+            IconButton(onClick = { onReturnHomeClick() }) {
                 Icon(
                     imageVector = Icons.Filled.Home,
                     contentDescription = stringResource(R.string.description_return_home),
@@ -46,7 +45,7 @@ fun TopBar(
             }
         },
         actions = {
-            IconButton(onClick = { onEvent(GameUiEvent.SetSoundEnabled(!soundEnabled)) }) {
+            IconButton(onClick = { onToggleSound(!soundEnabled) }) {
                 val icon = if (soundEnabled) Icons.AutoMirrored.Filled.VolumeUp else Icons.AutoMirrored.Filled.VolumeMute
                 Icon(icon, contentDescription = stringResource(R.string.description_option_toggle_sound))
             }
@@ -57,21 +56,8 @@ fun TopBar(
                 )
 
                 OptionsMenu (
+                    options = options,
                     expanded = showOptionsMenu,
-                    onClickItem = { option ->
-                        when (option.id) {
-                            0 -> {
-                                onEvent(GameUiEvent.StartNewGame)
-                                onClickOpenDifficultyDialog()
-                            }
-                            1 -> {
-                                onClickOpenDifficultyDialog()
-                            }
-                            2 -> {
-                                onEvent(GameUiEvent.ResetScores)
-                            }
-                        }
-                    },
                     onDismiss = { showOptionsMenu = false },
                     modifier = Modifier
                 )

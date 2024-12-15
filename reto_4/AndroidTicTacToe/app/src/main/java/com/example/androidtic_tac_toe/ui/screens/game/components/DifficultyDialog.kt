@@ -21,7 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.androidtic_tac_toe.R
-import com.example.androidtic_tac_toe.data.model.DifficultyLevel
+import com.example.androidtic_tac_toe.model.DifficultyLevel
 
 /**
  * Displays a dialog for selecting the difficulty level.
@@ -37,7 +37,7 @@ fun DifficultyDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(text = stringResource(R.string.text_title_difficulty)) },
+        title = { Text(text = stringResource(R.string.title_text_difficulty)) },
         text = {
             Column {
                 DifficultyLevel.entries.forEach { difficultyLevel ->
@@ -55,9 +55,9 @@ fun DifficultyDialog(
                         Spacer(modifier = Modifier.width(8.dp))
 
                         val difficultyLevelText = when (difficultyLevel) {
-                            DifficultyLevel.EASY -> stringResource(R.string.text_option_easy)
-                            DifficultyLevel.HARDER -> stringResource(R.string.text_option_harder)
-                            DifficultyLevel.EXPERT -> stringResource(R.string.text_option_expert)
+                            DifficultyLevel.EASY -> stringResource(R.string.option_text_easy)
+                            DifficultyLevel.HARDER -> stringResource(R.string.option_text_harder)
+                            DifficultyLevel.EXPERT -> stringResource(R.string.option_text_expert)
                         }
 
                         Text(text = difficultyLevelText)
@@ -70,14 +70,14 @@ fun DifficultyDialog(
                 onClickSetDifficultyLevel(selectedDifficultyLevel)
                 onDismiss()
             }) {
-                Text(text = stringResource(R.string.text_option_ok))
+                Text(text = stringResource(R.string.option_text_ok))
             }
         },
         dismissButton = {
             Button(onClick = {
                 onDismiss()
             }) {
-                Text(text = stringResource(R.string.text_option_close))
+                Text(text = stringResource(R.string.option_text_close))
             }
         },
         modifier = modifier

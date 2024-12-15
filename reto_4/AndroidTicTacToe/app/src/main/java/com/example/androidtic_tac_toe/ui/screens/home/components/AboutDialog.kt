@@ -34,7 +34,7 @@ fun AboutDialog(
         onDismissRequest = onDismiss,
         title = {
             Text(
-                text = stringResource(R.string.text_option_about),
+                text = stringResource(R.string.button_text_about),
                 style = typography.headlineMedium,
             )
         },
@@ -60,7 +60,7 @@ fun AboutDialog(
         },
         confirmButton = {
             Button (onClick = onDismiss) {
-                Text(stringResource(R.string.text_option_ok))
+                Text(stringResource(R.string.option_text_ok))
             }
         },
         modifier = modifier

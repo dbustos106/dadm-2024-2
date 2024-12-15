@@ -22,15 +22,18 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.androidtic_tac_toe.R
-import com.example.androidtic_tac_toe.ui.screens.game.GameState
-import com.example.androidtic_tac_toe.ui.screens.game.Player
+import com.example.androidtic_tac_toe.model.GameState
+import com.example.androidtic_tac_toe.model.Player
+import com.example.androidtic_tac_toe.ui.screens.game.GameMode
 
 /**
  * Displays a section with the computer's image and thinking indicator.
  * Visible when it is the computer's turn.
  */
 @Composable
-fun ComputerSection(
+fun InfoSection(
+    userPlayer: Player,
+    gameMode: GameMode,
     gameState: GameState,
     currentPlayer: Player,
     modifier: Modifier = Modifier
@@ -41,7 +44,10 @@ fun ComputerSection(
         modifier = modifier
     ){
         Image(
-            painter = painterResource(R.drawable.computer_section),
+            painter = when(gameMode) {
+                GameMode.SINGLE_PLAYER -> painterResource(R.drawable.computer_section)
+                else -> painterResource(R.drawable.default_avatar)
+            },
             contentDescription = stringResource(R.string.description_computer_image),
             contentScale = ContentScale.Crop,
             modifier = Modifier
@@ -56,12 +62,18 @@ fun ComputerSection(
                 .background(colorScheme.surfaceVariant)
         ) {
             val infoText = when (gameState) {
-                GameState.TIE -> stringResource(R.string.text_state_tie)
-                GameState.WINNER_HUMAN -> stringResource(R.string.text_state_human_won)
-                GameState.WINNER_COMPUTER -> stringResource(R.string.text_state_android_won)
+                GameState.TIE -> stringResource(R.string.state_text_tie)
+                GameState.WINNER_X -> {
+                    if(userPlayer == Player.X) stringResource(R.string.state_text_won)
+                    else stringResource(R.string.state_text_loss)
+                }
+                GameState.WINNER_O -> {
+                    if(userPlayer == Player.O) stringResource(R.string.state_text_won)
+                    else stringResource(R.string.state_text_loss)
+                }
                 else -> {
-                    if (currentPlayer == Player.COMPUTER) stringResource(R.string.text_state_android_turn)
-                    else stringResource(R.string.text_state_human_turn)
+                    if(currentPlayer == userPlayer) stringResource (R.string.state_text_your_turn)
+                    else stringResource(R.string.state_text_not_your_turn)
                 }
             }
 

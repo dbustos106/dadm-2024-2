@@ -22,8 +22,8 @@ import com.example.androidtic_tac_toe.R
 @Composable
 fun ScoreSection(
     numberTies: Int,
-    numberHumanWins: Int,
-    numberComputerWins: Int,
+    numberWins: Int,
+    numberLosses: Int,
     modifier: Modifier = Modifier
 ){
     Row(
@@ -32,18 +32,18 @@ fun ScoreSection(
         modifier = modifier
     ) {
         ScoreItem(
-            score = numberHumanWins,
-            label = stringResource(R.string.text_human_score),
+            score = numberWins,
+            label = stringResource(R.string.score_text_win),
             Modifier.weight(1f)
         )
         ScoreItem(
-            score = numberComputerWins,
-            label = stringResource(R.string.text_android_score),
+            score = numberLosses,
+            label = stringResource(R.string.score_text_loss),
             Modifier.weight(1f)
         )
         ScoreItem(
             score = numberTies,
-            label = stringResource(R.string.text_tie_score),
+            label = stringResource(R.string.score_text_tie),
             Modifier.weight(1f)
         )
     }

@@ -7,29 +7,29 @@ import com.example.androidtic_tac_toe.R
 class MediaPlayerManager (
     private val context: Context
 ) {
-    private var mediaPlayerHuman: MediaPlayer? = null
-    private var mediaPlayerComputer: MediaPlayer? = null
+    private var mediaPlayerX: MediaPlayer? = null
+    private var mediaPlayerO: MediaPlayer? = null
 
     fun initialize() {
-        mediaPlayerHuman = MediaPlayer.create(context, R.raw.human_sound)
-        mediaPlayerComputer = MediaPlayer.create(context, R.raw.computer_sound)
+        mediaPlayerX = MediaPlayer.create(context, R.raw.human_sound)
+        mediaPlayerO = MediaPlayer.create(context, R.raw.computer_sound)
     }
 
     fun release() {
-        mediaPlayerHuman?.release()
-        mediaPlayerComputer?.release()
-        mediaPlayerHuman = null
-        mediaPlayerComputer = null
+        mediaPlayerX?.release()
+        mediaPlayerO?.release()
+        mediaPlayerX = null
+        mediaPlayerO = null
     }
 
-    fun playHumanSound() {
-        mediaPlayerHuman?.apply {
+    fun playXSound() {
+        mediaPlayerX?.apply {
             if (!isPlaying) start()
         }
     }
 
-    fun playComputerSound() {
-        mediaPlayerComputer?.apply {
+    fun playOSound() {
+        mediaPlayerO?.apply {
             if (!isPlaying) start()
         }
     }

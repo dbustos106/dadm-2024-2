@@ -30,6 +30,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.example.androidtic_tac_toe.R
+import com.example.androidtic_tac_toe.ui.screens.game.GameMode
 import com.example.androidtic_tac_toe.ui.screens.home.components.AboutDialog
 
 /**
@@ -39,7 +40,7 @@ import com.example.androidtic_tac_toe.ui.screens.home.components.AboutDialog
  */
 @Composable
 fun HomeScreen(
-    onClickStartNewGame: (String) -> Unit = {},
+    onStartNewGameClick: (GameMode) -> Unit = {},
     modifier: Modifier = Modifier
 ){
     var showAboutDialog by rememberSaveable { mutableStateOf(false) }
@@ -65,22 +66,22 @@ fun HomeScreen(
         }
 
         Button (
-            onClick = { onClickStartNewGame("SINGLE_PLAYER") },
+            onClick = { onStartNewGameClick(GameMode.SINGLE_PLAYER) },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(bottom = 16.dp, start = 20.dp, end = 20.dp)
 
         ) {
-            Text(text = stringResource(R.string.text_option_game_android))
+            Text(text = stringResource(R.string.button_text_game_android))
         }
 
         Button(
-            onClick = { onClickStartNewGame("MULTIPLAYER") },
+            onClick = { onStartNewGameClick(GameMode.MULTIPLAYER) },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(bottom = 16.dp, start = 20.dp, end = 20.dp)
         ) {
-            Text(text = stringResource(R.string.text_option_game_friend))
+            Text(text = stringResource(R.string.button_text_online_game))
         }
 
         Button(
@@ -89,7 +90,7 @@ fun HomeScreen(
                 .fillMaxWidth()
                 .padding(bottom = 16.dp, start = 20.dp, end = 20.dp)
         ) {
-            Text(text = stringResource(R.string.text_option_about))
+            Text(text = stringResource(R.string.button_text_about))
         }
 
     }

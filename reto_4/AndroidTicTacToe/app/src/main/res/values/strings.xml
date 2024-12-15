@@ -1,31 +1,36 @@
 <resources>
     <string name="app_name">Triqui Battle</string>
-    <string name="text_title_exit">Confirmar salida</string>
-    <string name="text_title_difficulty">Selección de dificultad</string>
-    <string name="text_confirm_exit">¿Estás seguro de que quieres salir de la aplicación?</string>
-    <string name="text_human_score">Tu</string>
-    <string name="text_android_score">Android</string>
-    <string name="text_tie_score">Empates</string>
+
+    <string name="button_text_game_android">Jugar contra Android</string>
+    <string name="button_text_online_game">Jugar Online</string>
+    <string name="state_text_tie">Es un empate :c</string>
+    <string name="state_text_won">¡¡¡Has ganado!!!</string>
+    <string name="state_text_loss">Has perdido :(</string>
+    <string name="state_text_your_turn">Es tu turno, ¡haz una buena jugada!</string>
+    <string name="state_text_not_your_turn">Turno de tu oponente</string>
+    <string name="score_text_win">Victorias</string>
+    <string name="score_text_loss">Derrotas</string>
+    <string name="score_text_tie">Empates</string>
+
+    <string name="title_text_difficulty">Selección de dificultad</string>
+    <string name="option_text_start_game">Nuevo Juego</string>
+    <string name="option_text_change_difficulty">Cambiar dificultad</string>
+    <string name="option_text_reset_scores">Reiniciar puntuaciones</string>
+    <string name="option_text_easy">Fácil</string>
+    <string name="option_text_harder">Difícil</string>
+    <string name="option_text_expert">Experto</string>
+    <string name="option_text_close">Cerrar</string>
+
+    <string name="text_message_game_created">ID del juego creado: %s</string>
+    <string name="text_game_id_label">Juego ID: %1$s</string>
+    <string name="title_text_available_games">Juegos Disponibles</string>
+    <string name="button_text_create_new_game">Crear un nuevo juego</string>
+    <string name="button_text_no_available_games">No hay juegos disponibles en este momento.</string>
+
+    <string name="button_text_about">Acerca de</string>
     <string name="text_about">Este es un juego de Tic-Tac-Toe creado con Jetpack Compose.\n\nVersión 1.0\n\nBy David Julian Bustos Cortes</string>
-    <string name="text_state_tie">¡¡¡Es un empate!!!</string>
-    <string name="text_state_human_won">¡¡¡Has ganado!!!</string>
-    <string name="text_state_android_won">¡¡¡Android ha ganado!!!</string>
-    <string name="text_state_android_turn">Turno de Android</string>
-    <string name="text_state_human_turn">Es tu turno, ¡haz una buena jugada!</string>
-    <string name="text_option_start_game">Nuevo Juego</string>
-    <string name="text_option_change_difficulty">Cambiar dificultad</string>
-    <string name="text_option_reset_scores">Reiniciar puntuaciones</string>
-    <string name="text_option_game_android">Jugar contra Android</string>
-    <string name="text_option_game_friend">Jugar con un amigo</string>
-    <string name="text_option_about">Acerca de</string>
-    <string name="text_option_exit">Salir</string>
-    <string name="text_option_close">Cerrar</string>
-    <string name="text_option_yes">Si</string>
-    <string name="text_option_no">No</string>
-    <string name="text_option_ok">OK</string>
-    <string name="text_option_easy">Fácil</string>
-    <string name="text_option_harder">Difícil</string>
-    <string name="text_option_expert">Experto</string>
+    <string name="option_text_ok">OK</string>
+
     <string name="description_menu_options">Más opciones</string>
     <string name="description_about_image">Imagen de about</string>
     <string name="description_app_icon">Icono de la aplicación</string>

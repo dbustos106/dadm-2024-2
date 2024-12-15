@@ -1,10 +1,10 @@
-package com.example.androidtic_tac_toe.data.model
+package com.example.androidtic_tac_toe.model
 
 data class UserPreferences (
     val difficultyLevel: DifficultyLevel,
     val soundEnabled: Boolean,
-    val numberComputerWins: Int,
-    val numberHumanWins: Int,
+    val numberLosses: Int,
+    val numberWins: Int,
     val numberTies: Int,
 )
 

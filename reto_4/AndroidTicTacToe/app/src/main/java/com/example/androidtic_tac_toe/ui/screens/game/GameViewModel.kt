@@ -2,8 +2,13 @@ package com.example.androidtic_tac_toe.ui.screens.game
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.androidtic_tac_toe.data.GameRepository
 import com.example.androidtic_tac_toe.data.UserPreferencesRepository
-import com.example.androidtic_tac_toe.data.model.DifficultyLevel
+import com.example.androidtic_tac_toe.model.DifficultyLevel
+import com.example.androidtic_tac_toe.model.Game
+import com.example.androidtic_tac_toe.model.GameState
+import com.example.androidtic_tac_toe.model.Player
+import com.example.androidtic_tac_toe.model.SquareState
 import com.example.androidtic_tac_toe.shared.MediaPlayerManager
 import com.example.androidtic_tac_toe.ui.screens.game.events.GameUiEvent
 import com.example.androidtic_tac_toe.ui.screens.game.events.GameViewModelEvent
@@ -17,6 +22,7 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.util.UUID
 import javax.inject.Inject
 import kotlin.random.Random
 
@@ -27,6 +33,7 @@ const val BOARD_SIZE = 9
  */
 @HiltViewModel
 class GameViewModel @Inject constructor(
+    private val gameRepository: GameRepository,
     private val mediaPlayerManager: MediaPlayerManager,
     private val userPreferencesRepository: UserPreferencesRepository
 ) : ViewModel() {
@@ -40,25 +47,19 @@ class GameViewModel @Inject constructor(
     val uiState: StateFlow<GameUiState> = _uiState.asStateFlow()
 
     /**
-     * Initializes a new game and load the user preferences.
+     * Load the user preferences.
      */
     init {
         viewModelScope.launch {
             userPreferencesRepository.userPreferencesFlow.collect { userPreferences ->
                 _uiState.update { currentState ->
                     currentState.copy(
-                        difficultyLevel = userPreferences.difficultyLevel,
-                        soundEnabled = userPreferences.soundEnabled,
-                        numberComputerWins = userPreferences.numberComputerWins,
-                        numberHumanWins = userPreferences.numberHumanWins,
-                        numberTies = userPreferences.numberTies,
+                        userPreferences = userPreferences,
                         loading = false
                     )
                 }
             }
         }
-
-        startNewGame()
     }
 
     /**
@@ -67,11 +68,14 @@ class GameViewModel @Inject constructor(
      */
     fun onEvent(event: GameUiEvent) {
         when(event) {
-            is GameUiEvent.StartNewGame -> {
-                startNewGame()
+            is GameUiEvent.SetGameMode -> {
+                setGameMode(event.gameMode)
             }
-            is GameUiEvent.ResetScores -> {
-                resetScores()
+            is GameUiEvent.StartNewLocalGame -> {
+                startNewLocalGame()
+            }
+            is GameUiEvent.MakePlayerMove -> {
+                makePlayerMove(event.location)
             }
             is GameUiEvent.SetDifficultyLevel -> {
                 setDifficultyLevel(event.difficultyLevel)
@@ -79,29 +83,60 @@ class GameViewModel @Inject constructor(
             is GameUiEvent.SetSoundEnabled -> {
                 setSoundEnabled(event.soundEnabled)
             }
-            is GameUiEvent.MakeHumanMove -> {
-                makeHumanMove(event.location)
+            is GameUiEvent.ResetScores -> {
+                resetScores()
+            }
+
+            // Multiplayer functions
+            is GameUiEvent.StartNewOnlineGame -> {
+                startNewOnlineGame()
+            }
+            is GameUiEvent.StartObservingAvailableGames -> {
+                startObservingAvailableGames()
+            }
+            is GameUiEvent.StopObservingAvailableGames -> {
+                stopObservingAvailableGames()
+            }
+            is GameUiEvent.SelectOnlineGame -> {
+                selectOnlineGame(event.gameId)
+            }
+            is GameUiEvent.DeleteOnlineGameIfNeeded -> {
+                removeOnlineGameListener()
             }
         }
     }
 
     /**
-     * Starts a new game, setting a random starting player.
-     * If the computer goes first, it makes an initial move.
+     * Sets the game mode (e.g., single player or multiplayer).
+     * @param gameMode The game mode to set.
      */
-    private fun startNewGame() {
-        // Reset the game state
+    private fun setGameMode(gameMode: GameMode){
         _uiState.update { currentState ->
             currentState.copy(
-                gameState = GameState.NO_WINNER,
-                currentPlayer = selectRandomPlayer(),
-                board = List(9) { SquareState() },
-                gameOver = false,
+                gameMode = gameMode,
+            )
+        }
+    }
+
+    /**
+     * Starts a new local game with the selected settings.
+     */
+    private fun startNewLocalGame() {
+        _uiState.update { currentState ->
+            currentState.copy(
+                userPlayer = Player.X,
+                selectedGame = Game(
+                    gameId = null,
+                    board = List(9) { SquareState() },
+                    gameOver = false,
+                    currentPlayer = selectRandomPlayer(),
+                    gameState = GameState.NO_WINNER
+                ),
             )
         }
 
         // Make computer move if it’s its turn
-        if(_uiState.value.currentPlayer == Player.COMPUTER) {
+        if(_uiState.value.selectedGame!!.currentPlayer == Player.O) {
             viewModelScope.launch {
                 delay(1000L)
                 makeComputerMove()
@@ -110,87 +145,70 @@ class GameViewModel @Inject constructor(
     }
 
     /**
-     * Selects a random player to start the game.
+     * Selects a random starting player (either X or O).
+     * @return The randomly selected player (X or O).
      */
     private fun selectRandomPlayer(): Player {
         if(Random.nextInt(2) == 0) {
-            return Player.HUMAN
+            return Player.X
         }
-        return Player.COMPUTER
+        return Player.O
     }
 
     /**
-     * Reset the game scores
+     * Makes the player's move at the specified location.
+     * @param location The index of the board where the player wants to place their move.
      */
-    private fun resetScores() {
-        viewModelScope.launch {
-            userPreferencesRepository.updateNumberComputerWins(0)
-            userPreferencesRepository.updateNumberHumanWins(0)
-            userPreferencesRepository.updateNumberTies(0)
-        }
-    }
+    private fun makePlayerMove(location: Int) {
+        setMove(_uiState.value.userPlayer!!, location)
 
-    /**
-     * Sets the game's difficulty level.
-     * @param difficultyLevel The difficulty level to set.
-     */
-    private fun setDifficultyLevel(difficultyLevel: DifficultyLevel) {
-        viewModelScope.launch {
-            userPreferencesRepository.updateDifficultyLevel(difficultyLevel)
-        }
-    }
-
-    /**
-     * Sets whether the sound is enabled or disabled.
-     * @param soundEnabled A boolean indicating whether the sound is enabled.
-     */
-    private fun setSoundEnabled(soundEnabled: Boolean){
-        viewModelScope.launch {
-            userPreferencesRepository.updateSoundEnabled(soundEnabled)
-        }
-    }
-
-    /**
-     * Handles the human player's move, checks for a winner, and
-     * initiates the computer's turn if the game is ongoing.
-     * @param location The index on the game board (0 to 8)
-     */
-    private fun makeHumanMove(location: Int) {
-        setMove(Player.HUMAN, location)
-
-        // Make the computer move if the game is not over
-        if(!_uiState.value.gameOver) {
-            viewModelScope.launch {
-                delay(1000L)
-                makeComputerMove()
+        when(_uiState.value.gameMode) {
+            GameMode.SINGLE_PLAYER -> {
+                // Make the computer move if the game is not over,
+                // and if the game mode is single player
+                if (!_uiState.value.selectedGame!!.gameOver) {
+                    viewModelScope.launch {
+                        delay(1000L)
+                        makeComputerMove()
+                    }
+                }
+            }
+            else -> {
+                gameRepository.updateMove(
+                    updatedGame = _uiState.value.selectedGame!!,
+                    onFailure = { exception ->
+                        _uiState.update { state ->
+                            state.copy(errorMessage = exception.message)
+                        }
+                    }
+                )
             }
         }
     }
 
     /**
-     *  Makes the computer's move based on the current game state and difficulty level.
-     *  It tries to win or block the player, otherwise selects a random open spot.
+     * Makes the computer's move if it's its turn.
      */
     private fun makeComputerMove() {
         var blockingMove: Int? = null
-        val board = _uiState.value.board.toMutableList()
+        val board = _uiState.value.selectedGame!!.board.toMutableList()
 
-        if(_uiState.value.difficultyLevel != DifficultyLevel.EASY) {
+        if(_uiState.value.userPreferences!!.difficultyLevel != DifficultyLevel.EASY) {
             for (i in 0 until BOARD_SIZE) {
                 if (board[i].player == Player.OPEN_SPOT) {
 
                     // See if there's a move O can make to win
-                    board[i] = board[i].copy(player = Player.COMPUTER)
-                    if (checkGameState(board) == GameState.WINNER_COMPUTER) {
-                        setMove(Player.COMPUTER, i)
+                    board[i] = board[i].copy(player = Player.O)
+                    if (checkGameState(board) == GameState.WINNER_O) {
+                        setMove(Player.O, i)
                         return
                     }
                     board[i] = board[i].copy(player = Player.OPEN_SPOT)
 
                     // If the difficulty level is expert, add logic to block the player
-                    if(_uiState.value.difficultyLevel == DifficultyLevel.EXPERT) {
-                        board[i] = board[i].copy(player = Player.HUMAN)
-                        if (checkGameState(board) == GameState.WINNER_HUMAN) {
+                    if(_uiState.value.userPreferences!!.difficultyLevel == DifficultyLevel.EXPERT) {
+                        board[i] = board[i].copy(player = Player.X)
+                        if (checkGameState(board) == GameState.WINNER_X) {
                             blockingMove = i
                         }
                         board[i] = board[i].copy(player = Player.OPEN_SPOT)
@@ -201,13 +219,13 @@ class GameViewModel @Inject constructor(
         }
 
         val location = blockingMove ?: (0 until BOARD_SIZE).filter { board[it].player == Player.OPEN_SPOT }.random()
-        setMove(Player.COMPUTER, location)
+        setMove(Player.O, location)
     }
 
     /**
-     * Evaluates the current state of the game based on the board.
-     * @param board A list of SquareState representing the current state of the game board.
-     * @return The current game state: WINNER_HUMAN, WINNER_COMPUTER, TIE, or NO_WINNER.
+     * Checks the current game state based on the current board layout.
+     * @param board The current state of the game board.
+     * @return The current game state (e.g., winner, tie, or no winner).
      */
     private fun checkGameState(board: List<SquareState>): GameState {
         val winningLines = listOf (
@@ -217,22 +235,22 @@ class GameViewModel @Inject constructor(
         )
 
         for(line in winningLines) {
-            if(board[line[0]].player == Player.HUMAN &&
-                board[line[1]].player == Player.HUMAN &&
-                board[line[2]].player == Player.HUMAN
+            if(board[line[0]].player == Player.X &&
+                board[line[1]].player == Player.X &&
+                board[line[2]].player == Player.X
             ) {
-                return GameState.WINNER_HUMAN
+                return GameState.WINNER_X
             }
-            if(board[line[0]].player == Player.COMPUTER &&
-                board[line[1]].player == Player.COMPUTER &&
-                board[line[2]].player == Player.COMPUTER
+            if(board[line[0]].player == Player.O &&
+                board[line[1]].player == Player.O &&
+                board[line[2]].player == Player.O
             ) {
-                return GameState.WINNER_COMPUTER
+                return GameState.WINNER_O
             }
         }
 
         // Check for tie
-        if(board.all { it.player == Player.HUMAN || it.player == Player.COMPUTER }) {
+        if(board.all { it.player == Player.X || it.player == Player.O }) {
             return GameState.TIE
         }
 
@@ -241,13 +259,12 @@ class GameViewModel @Inject constructor(
     }
 
     /**
-     * Updates the board with the player's move at the specified location.
-     * @param player The player making the move,
-     * @param location The index on the game board (0 to 8).
+     * Sets the move for a player at a specific board location and updates the game state.
+     * @param player The player making the move (X or O).
+     * @param location The index of the board where the player makes the move.
      */
     private fun setMove(player: Player, location: Int) {
-        // Make the move on a mutable copy of the board.
-        val currentBoard = _uiState.value.board.toMutableList()
+        val currentBoard = _uiState.value.selectedGame!!.board.toMutableList()
         currentBoard[location] = currentBoard[location].copy (
             player = player,
             enabled = false,
@@ -257,29 +274,254 @@ class GameViewModel @Inject constructor(
         val gameState = checkGameState(currentBoard)
         _uiState.update { currentState ->
             currentState.copy (
-                gameOver = (gameState == GameState.TIE || gameState == GameState.WINNER_HUMAN || gameState == GameState.WINNER_COMPUTER),
-                currentPlayer = if (_uiState.value.currentPlayer == Player.HUMAN) Player.COMPUTER else Player.HUMAN,
-                board = currentBoard,
-                gameState = gameState,
+                selectedGame = Game(
+                    gameId = currentState.selectedGame?.gameId,
+                    board = currentBoard,
+                    gameOver = (gameState == GameState.TIE || gameState == GameState.WINNER_X || gameState == GameState.WINNER_O),
+                    currentPlayer = if (_uiState.value.selectedGame!!.currentPlayer == Player.X) Player.O else Player.X,
+                    gameState = gameState,
+                ),
             )
         }
 
-        // Update the user preferences based on the move
-        viewModelScope.launch {
-            if (gameState == GameState.WINNER_HUMAN) userPreferencesRepository.updateNumberHumanWins(_uiState.value.numberHumanWins + 1)
-            if (gameState == GameState.WINNER_COMPUTER) userPreferencesRepository.updateNumberComputerWins(_uiState.value.numberComputerWins + 1)
-            if (gameState == GameState.TIE) userPreferencesRepository.updateNumberTies(_uiState.value.numberTies + 1)
-        }
+        updateScores(gameState)
+        emitMediaPlayer(player)
+    }
 
-        // Emit event to start the music based on player
+    /**
+     * Updates the scores based on the game state (e.g., increment wins, losses, or ties).
+     * @param gameState The current game state (e.g., winner, tie).
+     */
+    private fun updateScores(gameState: GameState){
         viewModelScope.launch {
-            if (_uiState.value.soundEnabled) {
+            when (gameState) {
+                GameState.WINNER_X -> {
+                    if (_uiState.value.userPlayer == Player.X) userPreferencesRepository.updateNumberWins(_uiState.value.userPreferences!!.numberWins + 1)
+                    else if (_uiState.value.userPlayer == Player.O) userPreferencesRepository.updateNumberLosses(_uiState.value.userPreferences!!.numberLosses + 1)
+                }
+                GameState.WINNER_O -> {
+                    if (_uiState.value.userPlayer == Player.O) userPreferencesRepository.updateNumberWins(_uiState.value.userPreferences!!.numberWins + 1)
+                    else if (_uiState.value.userPlayer == Player.X) userPreferencesRepository.updateNumberLosses(_uiState.value.userPreferences!!.numberLosses + 1)
+                }
+                GameState.TIE -> { userPreferencesRepository.updateNumberTies(_uiState.value.userPreferences!!.numberTies + 1) }
+                else -> {}
+            }
+        }
+    }
+
+    /**
+     * Emits a sound for the player who just made a move.
+     * @param player The player (X or O) who made the move.
+     */
+    private fun emitMediaPlayer(player: Player){
+        viewModelScope.launch {
+            if (_uiState.value.userPreferences!!.soundEnabled) {
                 when (player) {
-                    Player.HUMAN -> mediaPlayerManager.playHumanSound()
-                    else -> mediaPlayerManager.playComputerSound()
+                    Player.X -> mediaPlayerManager.playXSound()
+                    else -> mediaPlayerManager.playOSound()
                 }
             }
         }
+    }
+
+    /**
+     * Sets the difficulty level for the game.
+     * @param difficultyLevel The difficulty level to set.
+     */
+    private fun setDifficultyLevel(difficultyLevel: DifficultyLevel) {
+        viewModelScope.launch {
+            userPreferencesRepository.updateDifficultyLevel(difficultyLevel)
+        }
+    }
+
+    /**
+     * Enables or disables sound effects in the game.
+     * @param soundEnabled A boolean indicating whether sound effects should be enabled or disabled.
+     */
+    private fun setSoundEnabled(soundEnabled: Boolean){
+        viewModelScope.launch {
+            userPreferencesRepository.updateSoundEnabled(soundEnabled)
+        }
+    }
+
+    /**
+     * Resets the scores (wins, losses, and ties) to zero.
+     */
+    private fun resetScores() {
+        viewModelScope.launch {
+            userPreferencesRepository.updateNumberLosses(0)
+            userPreferencesRepository.updateNumberWins(0)
+            userPreferencesRepository.updateNumberTies(0)
+        }
+    }
+
+
+
+    // Multiplayer functions
+    /**
+     * Starts a new online game by creating a new game in the repository.
+     */
+    private fun startNewOnlineGame(){
+        val newGame = Game(
+            gameId = UUID.randomUUID().toString(),
+            isAvailable = true,
+            board = List(9) { SquareState() },
+            currentPlayer = selectRandomPlayer(),
+            gameState = GameState.NO_WINNER,
+            gameOver = false,
+        )
+
+        viewModelScope.launch {
+            gameRepository.createNewGame(newGame)
+                .onSuccess {
+                    _uiState.update { currentState ->
+                        currentState.copy(
+                            userPlayer = Player.X,
+                            selectedGame = newGame
+                        )
+                    }
+                    observeOnlineGame(newGame.gameId!!)
+                }
+                .onFailure { exception ->
+                    _uiState.update { currentState ->
+                        currentState.copy(errorMessage = exception.message)
+                    }
+                }
+        }
+    }
+
+    /**
+     * Starts observing available online games for matchmaking.
+     */
+    private fun startObservingAvailableGames(){
+        gameRepository.observeAvailableGames(
+            onInitialData = { games ->
+                _uiState.update { currentState ->
+                    currentState.copy(availableGames = games)
+                }
+            },
+            onGameAdded = { game ->
+                _uiState.update { currentState ->
+                    currentState.copy(
+                        availableGames = currentState.availableGames + game
+                    )
+                }
+            },
+            onGameRemoved = { gameId ->
+                _uiState.update { currentState ->
+                    currentState.copy(
+                        availableGames = currentState.availableGames.filter { it.gameId != gameId }
+                    )
+                }
+            },
+            onError = { exception ->
+                _uiState.update { currentState ->
+                    currentState.copy(errorMessage = exception.message)
+                }
+            }
+        )
+    }
+
+    /**
+     * Stops observing available online games.
+     */
+    private fun stopObservingAvailableGames(){
+        gameRepository.stopObservingAvailableGames()
+            .onSuccess {
+                _uiState.update { currentState ->
+                    currentState.copy(
+                        availableGames = emptyList()
+                    )
+                }
+            }
+            .onFailure { exception ->
+                _uiState.update { currentState ->
+                    currentState.copy(errorMessage = exception.message)
+                }
+            }
+    }
+
+    /**
+     * Selects an online game from the available games.
+     * @param gameId The ID of the game to select.
+     */
+    private fun selectOnlineGame(gameId: String) {
+        viewModelScope.launch {
+            gameRepository.selectGame(gameId)
+                .onSuccess { game ->
+                    _uiState.update { currentState ->
+                        currentState.copy(
+                            userPlayer = Player.O,
+                            selectedGame = game
+                        )
+                    }
+                    observeOnlineGame(game.gameId!!)
+                }
+                .onFailure { exception ->
+                    _uiState.update { currentState ->
+                        currentState.copy(errorMessage = exception.message)
+                    }
+                }
+        }
+    }
+
+    /**
+     * Starts observing the selected online game for updates.
+     * @param gameId The ID of the game to observe.
+     */
+    private fun observeOnlineGame(gameId: String) {
+        gameRepository.observeGame(
+            gameId = gameId,
+            onGameUpdate = { updatedGame ->
+                _uiState.update { state ->
+                    state.copy(selectedGame = updatedGame)
+                }
+                updateScores(updatedGame.gameState)
+                emitMediaPlayer(updatedGame.currentPlayer)
+            },
+            onFailure = { exception ->
+                _uiState.update { state ->
+                    state.copy(errorMessage = exception.message)
+                }
+            }
+        )
+    }
+
+    /**
+     * Removes the listener for the selected online game.
+     */
+    private fun removeOnlineGameListener() {
+        if (_uiState.value.gameMode == GameMode.MULTIPLAYER) {
+            val gameId = _uiState.value.selectedGame?.gameId ?: return
+            gameRepository.removeGameListener(gameId)
+                .onSuccess { deleteOnlineGameIfNeeded(gameId) }
+                .onFailure { exception ->
+                    _uiState.update { state ->
+                        state.copy(errorMessage = exception.message)
+                    }
+                }
+        }
+    }
+
+    /**
+     * Deletes the online game from the repository if certain conditions are met.
+     * @param gameId The ID of the game to delete.
+     */
+    private fun deleteOnlineGameIfNeeded(gameId: String){
+        gameRepository.deleteGame(gameId,
+            onSuccess = {
+                _uiState.update { currentState ->
+                    currentState.copy(
+                        selectedGame = null
+                    )
+                }
+            },
+            onFailure = { exception ->
+                _uiState.update { currentState ->
+                    currentState.copy(errorMessage = exception.message)
+                }
+            }
+        )
     }
 
 }

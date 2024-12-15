@@ -13,15 +13,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import com.example.androidtic_tac_toe.R
 
 data class MenuOption(
     val id: Int,
     val name: String,
     val image: Painter?,
+    val onClick: () -> Unit
 )
 
 /**
@@ -31,28 +29,10 @@ data class MenuOption(
 @Composable
 fun OptionsMenu(
     expanded: Boolean,
+    options: List<MenuOption>,
     onDismiss: () -> Unit,
-    onClickItem: (MenuOption) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val options = listOf(
-        MenuOption(
-            id = 0,
-            name = stringResource(R.string.text_option_start_game),
-            image = painterResource(id = R.drawable.startgame)
-        ),
-        MenuOption(
-            id = 1,
-            name = stringResource(R.string.text_option_change_difficulty),
-            image = painterResource(id = R.drawable.change_difficulty)
-        ),
-        MenuOption(
-            id = 2,
-            name = stringResource(R.string.text_option_reset_scores),
-            image = painterResource(id = R.drawable.reset_scores)
-        ),
-    )
-
     DropdownMenu (
         expanded = expanded,
         onDismissRequest = onDismiss,
@@ -61,7 +41,7 @@ fun OptionsMenu(
         options.forEach { option ->
             DropdownMenuItem(
                 onClick = {
-                    onClickItem(option)
+                    option.onClick()
                     onDismiss()
                 },
                 text = {

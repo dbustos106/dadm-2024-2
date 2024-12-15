@@ -15,8 +15,8 @@ import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import com.example.androidtic_tac_toe.R
-import com.example.androidtic_tac_toe.ui.screens.game.Player
-import com.example.androidtic_tac_toe.ui.screens.game.SquareState
+import com.example.androidtic_tac_toe.model.Player
+import com.example.androidtic_tac_toe.model.SquareState
 
 /**
  * Composable for displaying the Tic-Tac-Toe game board.
@@ -24,6 +24,7 @@ import com.example.androidtic_tac_toe.ui.screens.game.SquareState
  */
 @Composable
 fun GameBoard(
+    userPlayer: Player,
     isGameOver: Boolean,
     currentUser: Player,
     board: List<SquareState>,
@@ -49,7 +50,7 @@ fun GameBoard(
                 val row = (offset.y / cellHeight).toInt()
                 val location = row * columns + column
 
-                if (!isGameOver && currentUser == Player.HUMAN && board.getOrNull(location)?.enabled == true) {
+                if (!isGameOver && currentUser == userPlayer && board.getOrNull(location)?.enabled == true) {
                     onClickSquare(location)
                 }
             }
@@ -102,13 +103,13 @@ fun GameBoard(
             val top = (row * cellHeight + padding).toInt()
 
             when (squareState.player) {
-                Player.COMPUTER -> drawImage(
+                Player.O -> drawImage(
                     image = xPlayerBitmap,
                     dstOffset = IntOffset(left, top),
                     dstSize = IntSize(paddedWidth, paddedHeight),
                     filterQuality = FilterQuality.High
                 )
-                Player.HUMAN -> drawImage(
+                Player.X -> drawImage(
                     image = oPlayerBitmap,
                     dstOffset = IntOffset(left, top),
                     dstSize = IntSize(paddedWidth, paddedHeight),

@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "281011190268",
+    "firebase_url": "https://triqui-battle-default-rtdb.firebaseio.com",
+    "project_id": "triqui-battle",
+    "storage_bucket": "triqui-battle.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:281011190268:android:dde21091f66de9a2b99a79",
+        "android_client_info": {
+          "package_name": "com.example.androidtic_tac_toe"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD0FFs-1ik2rTYYeHu86_vG4lvSvPCYiAY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

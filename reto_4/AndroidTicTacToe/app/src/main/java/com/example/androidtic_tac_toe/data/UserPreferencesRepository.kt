@@ -1,5 +1,6 @@
 package com.example.androidtic_tac_toe.data
 
+import android.util.Log
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
@@ -7,8 +8,8 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
-import com.example.androidtic_tac_toe.data.model.DifficultyLevel
-import com.example.androidtic_tac_toe.data.model.UserPreferences
+import com.example.androidtic_tac_toe.model.DifficultyLevel
+import com.example.androidtic_tac_toe.model.UserPreferences
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
@@ -25,11 +26,11 @@ class UserPreferencesRepository @Inject constructor(
 ) {
 
     private object PreferencesKeys {
-        val DIFFICULTY_LEVEL = stringPreferencesKey("difficulty_level")
-        val SOUND_ENABLED = booleanPreferencesKey("sound_enabled")
-        val NUMBER_COMPUTER_WINS = intPreferencesKey("number_computer_wins")
-        val NUMBER_HUMAN_WINS = intPreferencesKey("number_human_wins")
-        val NUMBER_TIES = intPreferencesKey("number_ties")
+        val DIFFICULTY_LEVEL = stringPreferencesKey("difficulty_level_")
+        val SOUND_ENABLED = booleanPreferencesKey("sound_enabled_")
+        val NUMBER_LOSSES = intPreferencesKey("number_losses_")
+        val NUMBER_WINS = intPreferencesKey("number_wins_")
+        val NUMBER_TIES = intPreferencesKey("number_ties_")
     }
 
     /**
@@ -52,15 +53,17 @@ class UserPreferencesRepository @Inject constructor(
         )
 
         val soundEnabled = preferences[PreferencesKeys.SOUND_ENABLED] ?: true
-        val numberComputerWins = preferences[PreferencesKeys.NUMBER_COMPUTER_WINS] ?: 0
-        val numberHumanWins = preferences[PreferencesKeys.NUMBER_HUMAN_WINS] ?: 0
+        val numberLosses = preferences[PreferencesKeys.NUMBER_LOSSES] ?: 0
+        val numberWins = preferences[PreferencesKeys.NUMBER_WINS] ?: 0
         val numberTies = preferences[PreferencesKeys.NUMBER_TIES] ?: 0
+
+        Log.d("", "$numberTies")
 
         return UserPreferences(
             difficultyLevel = difficultyLevel,
             soundEnabled = soundEnabled,
-            numberComputerWins = numberComputerWins,
-            numberHumanWins = numberHumanWins,
+            numberLosses = numberLosses,
+            numberWins = numberWins,
             numberTies = numberTies
         )
     }
@@ -86,22 +89,22 @@ class UserPreferencesRepository @Inject constructor(
     }
 
     /**
-     * Updates the stored number of computer wins in the DataStore.
-     * @param numberComputerWins The new count of computer wins to be saved.
+     * Updates the stored number of losses in the DataStore.
+     * @param numberLosses The new count of losses to be saved.
      */
-    suspend fun updateNumberComputerWins(numberComputerWins: Int){
+    suspend fun updateNumberLosses(numberLosses: Int){
         dataStore.edit { preferences ->
-            preferences[PreferencesKeys.NUMBER_COMPUTER_WINS] = numberComputerWins
+            preferences[PreferencesKeys.NUMBER_LOSSES] = numberLosses
         }
     }
 
     /**
-     * Updates the stored number of human wins in the DataStore.
-     * @param numberHumanWins The new count of human wins to be saved.
+     * Updates the stored number of wins in the DataStore.
+     * @param numberWins The new count of wins to be saved.
      */
-    suspend fun updateNumberHumanWins(numberHumanWins: Int){
+    suspend fun updateNumberWins(numberWins: Int){
         dataStore.edit { preferences ->
-            preferences[PreferencesKeys.NUMBER_HUMAN_WINS] = numberHumanWins
+            preferences[PreferencesKeys.NUMBER_WINS] = numberWins
         }
     }
 
